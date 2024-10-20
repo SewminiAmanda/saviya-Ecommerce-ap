@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'signup_page.dart';
+import 'login_page.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatelessWidget {
+  const SignupPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
           ),
           SingleChildScrollView(
             child: Container(
-              margin: const EdgeInsets.all(24),
+              margin: const EdgeInsets.all(0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -35,7 +35,7 @@ class LoginPage extends StatelessWidget {
                   _googleButton(context),
                   const SizedBox(height: 16),
                   _facebookButton(context),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 30),
                   _createAccountLink(context),
                 ],
               ),
@@ -49,7 +49,7 @@ class LoginPage extends StatelessWidget {
 
 Widget _header(BuildContext context) {
   return const SizedBox(
-    height: 400,
+    height: 350,
     width: 352,
     child: Image(
       image: AssetImage("assets/images/logo.png"),
@@ -65,6 +65,25 @@ Widget _inputField(BuildContext context) {
       SizedBox(
         width: 300,
         child: TextField(
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: "Email",
+            hintStyle: TextStyle(color: Colors.white70),
+            prefixIcon: Icon(Icons.mail, color: Colors.white),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white, width: 2),
+            ),
+          ),
+        ),
+      ),
+      SizedBox(height: 16),
+      SizedBox(
+        width: 300,
+        child: TextField(
+          obscureText: true,
           style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: "Username",
@@ -98,6 +117,25 @@ Widget _inputField(BuildContext context) {
           ),
         ),
       ),
+      SizedBox(height: 16),
+      SizedBox(
+        width: 300,
+        child: TextField(
+          obscureText: true,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: "Confirm Password",
+            hintStyle: TextStyle(color: Colors.white70),
+            prefixIcon: Icon(Icons.lock, color: Colors.white),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white, width: 2),
+            ),
+          ),
+        ),
+      ),
     ],
   );
 }
@@ -116,7 +154,7 @@ Widget _loginButton(BuildContext context) {
           ),
         ),
         child: const Text(
-          "Login",
+          "Create Account",
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -138,7 +176,7 @@ Widget _googleButton(BuildContext context) {
           ),
         ),
         child: const Text(
-          "Sign in with Google",
+          "Sign up with Google",
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -160,7 +198,7 @@ Widget _facebookButton(BuildContext context) {
           ),
         ),
         child: const Text(
-          "Sign in with Facebook",
+          "Sign up with Facebook",
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -174,26 +212,14 @@ Widget _createAccountLink(BuildContext context) {
     children: [
       TextButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SignupPage()),
-          );
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const LoginPage()));
         },
         child: const Text(
-          "Create an Account",
+          "Already have an account? Sign In",
           style: TextStyle(color: Colors.white),
         ),
-      ),
-      const SizedBox(width: 80), // Adds space between the buttons
-      TextButton(
-        onPressed: () {
-          // Navigate to Forgot Password page
-        },
-        child: const Text(
-          "Forgot Password?",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
+      )
     ],
   );
 }
