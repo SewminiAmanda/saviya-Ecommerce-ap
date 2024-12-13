@@ -1,4 +1,5 @@
 const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = require('../Model/index');  // Adjust if your database connection is in a different file
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define("User", {

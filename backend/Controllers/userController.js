@@ -1,57 +1,84 @@
-const bcrypt = require('bcryptjs'); // To hash the password
-const db = require("../Model/index.js"); // Path to your index.js file
-const Joi = require('joi'); // For input validation
+// controllers/authController.js
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const Joi = require('joi');
+const db = require('../Model/index'); // Import db object
+const User = db.users; // Access the User model from db
 
 // Validation schema using Joi
 const userValidationSchema = Joi.object({
   first_name: Joi.string().min(2).max(50).required(),
   last_name: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().required(),
-  password: Joi.string().min(4).required(), // Password should be at least 4 characters
+  password: Joi.string().min(4).required(),
 });
 
 // Signup function
 const signup = async (req, res) => {
-  console.log("Request Body:", req.body);
+  const { first_name, last_name, email, password } = req.body;
+
+  // Validate incoming request body
+  const { error } = userValidationSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   try {
-    const { first_name, last_name, email, password } = req.body;
-
-    // Validate input using Joi schema
-    const { error } = userValidationSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
-    // Check if the user already exists with the same email
-    const existingUser = await db.users.findOne({ where: { email } });
+    // Check if the user already exists
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: "Email is already in use." });
+      return res.status(400).json({ message: 'Email is already in use' });
     }
 
-    // Hash the password before storing it
-    const hashedPassword = await bcrypt.hash(password, 10); // Salt rounds set to 10
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
-    const newUser = await db.users.create({
+    // Create new user
+    const newUser = await User.create({
       first_name,
       last_name,
       email,
       password: hashedPassword,
     });
 
-    res.status(201).json({
-      message: "User registered successfully.",
-      user: {
-        id: newUser.id,
-        first_name: newUser.first_name,
-        last_name: newUser.last_name,
-        email: newUser.email,
-      },
-    });
+    res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ message: "Error creating user.", error: error.message });
+    console.log(error); // Log the error for debugging
+    res.status(500).json({ message: 'Error registering user', error: error.message });
   }
 };
 
-module.exports = { signup };
+// Login function
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  // Find user by email
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    return res.status(400).json({ message: 'Invalid credentials.' });
+  }
+
+  // Compare password with hashed password
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) {
+    return res.status(400).json({ message: 'Invalid credentials.' });
+  }
+
+  // Generate JWT token
+  const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+  res.status(200).json({
+    message: 'Login successful.',
+    token,
+  });
+};
+
+// Profile function
+const profile = (req, res) => {
+  res.status(200).json({
+    message: 'Access to profile',
+    user: req.user, // The user data comes from the JWT token
+  });
+};
+
+module.exports = { signup, login, profile };

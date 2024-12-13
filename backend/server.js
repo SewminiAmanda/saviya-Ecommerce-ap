@@ -3,7 +3,8 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const db = require("./Model"); // Sequelize instance and models
 const userRoutes = require("./Routes/userRoutes");
-require("dotenv").config();
+require('dotenv').config();
+
 
 const PORT = 8080;
 const app = express();

@@ -16,7 +16,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 // Import the User model
-db.users = require('./userModel')(sequelize, DataTypes);
+db.users = require('../Model/userModel')(sequelize, DataTypes);
 
 // Test database connection
 sequelize.authenticate()
