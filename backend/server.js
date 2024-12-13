@@ -1,32 +1,28 @@
-const express = require('express')
-const sequelize = require('sequelize')
-const dotenv = require('dotenv').config()
-const cookieParser = require('cookie-parser')
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const db = require("./Model"); // Sequelize instance and models
+const userRoutes = require("./Routes/userRoutes");
+require("dotenv").config();
 
+const PORT = 8080;
+const app = express();
 
- const db = require('./Model')
+// Middleware
+app.use(cors()); // Allows cross-origin requests
+app.use(express.json()); // Parses incoming JSON payloads
+app.use(express.urlencoded({ extended: true })); // Parses URL-encoded payloads
+app.use(cookieParser());
 
- const userRoutes = require ('./Routes/userRoutes')
- 
+// Routes
+app.use("/api/users", userRoutes);
 
-//setting up your port
-const PORT = process.env.PORT || 8080
-
-//assigning the variable app to express
-const app = express()
-
-app.use('/api/users', userRoutes);
-//middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser())
-
-//synchronizing the database and forcing it to false so we dont lose data
+// Sync database
 db.sequelize.sync({ force: true }).then(() => {
-    console.log("db has been re sync")
-})
+  console.log("Database synced successfully");
+});
 
-
-
-//listening to server connection
-app.listen(PORT, () => console.log(`Server is connected on ${PORT}`))
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
