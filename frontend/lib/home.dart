@@ -157,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                         child: GridView.builder(
                           padding: EdgeInsets.all(10),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
+                            crossAxisCount: 3,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 8,
                           ),
@@ -191,15 +191,15 @@ class _HomePageState extends State<HomePage> {
             child: Image.asset(
               imageUrl,
               fit: BoxFit.cover,
-              width: 30,
-              height: 30,
+              width: 40,
+              height: 40,
             ),
           ),
           SizedBox(height: 5),
           Text(
             categoryName,
             textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
         ],
       ),
