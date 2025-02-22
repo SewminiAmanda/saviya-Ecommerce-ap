@@ -4,8 +4,8 @@ class CustomHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      height: 60,
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 4), // Reduced bottom padding
+      height: 110, // Keep the header height the same
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -21,38 +21,36 @@ class CustomHeader extends StatelessWidget {
         children: [
           // Left side - Menu icon
           IconButton(
-            icon: Icon(Icons.menu),
+            icon: const Icon(Icons.menu),
             onPressed: () {},
           ),
-          
-          // Center - Logo
-          Expanded(
-            child: Center(
-              child: Image.asset(
-                'assets/images/logo.png',
-                height: 200,
 
-              ),
+          // Center - Enlarged Logo (Shifted Right)
+          Padding(
+            padding: const EdgeInsets.only(left: 20,), // Moves the logo to the right
+            child: Image.asset(
+              'assets/images/logo.png',
+              height: 100,
             ),
           ),
-          
+
           // Right side - Icons
           Row(
             children: [
               IconButton(
-                icon: Icon(Icons.search),
+                icon: const Icon(Icons.search),
                 onPressed: () {},
               ),
               IconButton(
-                icon: Icon(Icons.shopping_cart),
+                icon: const Icon(Icons.shopping_cart),
                 onPressed: () {},
               ),
               IconButton(
-                icon: Icon(Icons.message),
+                icon: const Icon(Icons.message),
                 onPressed: () {},
               ),
               IconButton(
-                icon: Icon(Icons.person),
+                icon: const Icon(Icons.person),
                 onPressed: () {},
               ),
             ],

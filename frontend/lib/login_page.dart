@@ -24,7 +24,7 @@ class LoginPage extends StatelessWidget {
           ),
           Container(
             color: const Color(
-                0x7A262525), // 0x7A = 47% opacity + hex color #262525
+                0x7A262525), 
           ),
           SingleChildScrollView(
             child: Container(

@@ -51,4 +51,12 @@ class ApiService {
       throw Exception('Failed to login');
     }
   }
+
+  static Future<List<dynamic>> getCategories() async {
+  var response = await http.get(Uri.parse('$baseUrl/category/'));
+  var data = jsonDecode(response.body); // Decode the response body
+  return data['category']; // Return the categories array from the response
 }
+
+}
+
