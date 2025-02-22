@@ -1,84 +1,80 @@
-// controllers/authController.js
-const bcrypt = require('bcryptjs');
+const User = require('../models/userModel');  // Import the user model
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Joi = require('joi');
-const db = require('../Model/index'); // Import db object
-const User = db.users; // Access the User model from db
 
-// Validation schema using Joi
-const userValidationSchema = Joi.object({
-  first_name: Joi.string().min(2).max(50).required(),
-  last_name: Joi.string().min(2).max(50).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(4).required(),
-});
+const SECRET_KEY = '78a07bdfe276a6c00a94cfda343629dbb5d338bac19dae41b1929ee63b969'; // Replace with a strong secret key
 
-// Signup function
-const signup = async (req, res) => {
-  const { first_name, last_name, email, password } = req.body;
+const UserController = {
+    // Register a new user
+    register: async (req, res) => {
+        const { first_name, last_name, email, password, address, phone_number, role, is_active, profile_picture } = req.body;
 
-  // Validate incoming request body
-  const { error } = userValidationSchema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
+        try {
+            const existingUser = await User.findByEmail(email);
+            if (existingUser) {
+                return res.status(400).json({ success: false, message: 'User already exists with that email' });
+            }
 
-  try {
-    // Check if the user already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email is already in use' });
+            // Set default values for optional fields if they are not provided
+            const userData = {
+                first_name,
+                last_name,
+                email,
+                password,
+                address: address || null,
+                phone_number: phone_number || null,
+                role: role || 'user', // Default role is 'user'
+                is_active: is_active !== undefined ? is_active : true, // Default is_active is true
+                profile_picture: profile_picture || null
+            };
+
+            const newUser = await User.create(
+                userData.first_name,
+                userData.last_name,
+                userData.email,
+                userData.password,
+                userData.address,
+                userData.phone_number,
+                userData.role,
+                userData.is_active,
+                userData.profile_picture
+            );
+
+            // Respond with the created user data (without token)
+            res.status(201).json({
+                success: true,
+                message: 'User registered successfully',
+                user: { userId: newUser.userId, first_name: newUser.first_name, last_name: newUser.last_name, email: newUser.email }
+            });
+        } catch (err) {
+            res.status(500).json({ success: false, message: 'Error registering user', error: err.message });
+        }
+    },
+
+    // Login user
+login: async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findByEmail(email);
+        if (user && await bcrypt.compare(password, user.password)) {
+            // Generate token with 30 minutes expiration
+            const token = jwt.sign({ userId: user.userId, email: user.email }, SECRET_KEY, { expiresIn: '30m' });
+
+            res.status(200).json({
+                success: true,
+                message: 'Login successful',
+                user: { userId: user.userId, first_name: user.first_name, last_name: user.last_name, email: user.email },
+                token // Send the token in the response
+            });
+        } else {
+            res.status(400).json({ success: false, message: 'Invalid credentials' });
+        }
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Error logging in', error: err.message });
     }
+},
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user
-    const newUser = await User.create({
-      first_name,
-      last_name,
-      email,
-      password: hashedPassword,
-    });
-
-    res.status(201).json({ message: 'User registered successfully', user: newUser });
-  } catch (error) {
-    console.log(error); // Log the error for debugging
-    res.status(500).json({ message: 'Error registering user', error: error.message });
-  }
 };
 
-// Login function
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  // Find user by email
-  const user = await User.findOne({ where: { email } });
-  if (!user) {
-    return res.status(400).json({ message: 'Invalid credentials.' });
-  }
-
-  // Compare password with hashed password
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) {
-    return res.status(400).json({ message: 'Invalid credentials.' });
-  }
-
-  // Generate JWT token
-  const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-  res.status(200).json({
-    message: 'Login successful.',
-    token,
-  });
-};
-
-// Profile function
-const profile = (req, res) => {
-  res.status(200).json({
-    message: 'Access to profile',
-    user: req.user, // The user data comes from the JWT token
-  });
-};
-
-module.exports = { signup, login, profile };
+module.exports = UserController;

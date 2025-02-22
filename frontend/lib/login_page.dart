@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'signup_page.dart';
+import 'home.dart';
+import 'api_service.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
       body: Stack(
         children: [
@@ -28,9 +33,9 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _header(context),
-                  _inputField(context),
+                  _inputField(context, emailController, passwordController),
                   const SizedBox(height: 20),
-                  _loginButton(context),
+                  _loginButton(context, emailController, passwordController),
                   const SizedBox(height: 30),
                   _googleButton(context),
                   const SizedBox(height: 16),
@@ -58,43 +63,37 @@ Widget _header(BuildContext context) {
   );
 }
 
-Widget _inputField(BuildContext context) {
-  return const Column(
+Widget _inputField(BuildContext context, TextEditingController emailController, TextEditingController passwordController) {
+  return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       SizedBox(
         width: 300,
         child: TextField(
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: "Username",
+          controller: emailController,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: "Email",
             hintStyle: TextStyle(color: Colors.white70),
             prefixIcon: Icon(Icons.person, color: Colors.white),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white, width: 2),
-            ),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
           ),
         ),
       ),
-      SizedBox(height: 16),
+      const SizedBox(height: 16),
       SizedBox(
         width: 300,
         child: TextField(
+          controller: passwordController,
           obscureText: true,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
             hintText: "Password",
             hintStyle: TextStyle(color: Colors.white70),
             prefixIcon: Icon(Icons.lock, color: Colors.white),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white, width: 2),
-            ),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
           ),
         ),
       ),
@@ -102,12 +101,39 @@ Widget _inputField(BuildContext context) {
   );
 }
 
-Widget _loginButton(BuildContext context) {
+
+Widget _loginButton(BuildContext context,TextEditingController emailController, TextEditingController passwordController) {
   return Center(
     child: SizedBox(
       width: 300,
       child: OutlinedButton(
-        onPressed: () {},
+        onPressed: () async {
+          String email = emailController.text.trim();
+          String password = passwordController.text.trim();
+          
+           if (email.isNotEmpty && password.isNotEmpty) {
+            try {
+              var response = await ApiService.loginUser(email: email, password: password);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Login Successful! Welcome, ${response['user']['first_name']}')),
+              );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Login Failed: ${e.toString()}')),
+              );
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Please enter email and password')),
+            );
+          
+          }
+          
+        },
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Colors.white, width: 2),
           padding: const EdgeInsets.symmetric(vertical: 16),

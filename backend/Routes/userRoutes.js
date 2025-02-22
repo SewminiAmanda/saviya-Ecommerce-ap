@@ -1,12 +1,10 @@
-const express = require("express");
-const { signup, login, profile } = require("../Controllers/userController");
-const { verifyToken } = require('../Middleware/verifyToken');
+const express = require('express');
+const UserController = require('../controllers/userController');  // Import user controller
+
 const router = express.Router();
 
-router.post("/signup", signup);
-
-router.post('/login', login);
-
-router.get('/profile', verifyToken, profile);
+// User routes
+router.post('/register', UserController.register);  // Register user
+router.post('/login', UserController.login);        // Login user
 
 module.exports = router;
