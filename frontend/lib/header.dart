@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'home.dart'; // Make sure to import HomePage
 
 class CustomHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 4), // Reduced bottom padding
-      height: 110, // Keep the header height the same
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 4),
+      height: 110,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -26,11 +27,20 @@ class CustomHeader extends StatelessWidget {
           ),
 
           // Center - Enlarged Logo (Shifted Right)
-          Padding(
-            padding: const EdgeInsets.only(left: 20,), // Moves the logo to the right
-            child: Image.asset(
-              'assets/images/logo.png',
-              height: 100,
+          GestureDetector(
+            onTap: () {
+              // Directly navigate to HomePage when logo is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20,), // Moves the logo to the right
+              child: Image.asset(
+                'assets/images/logo.png',
+                height: 100,
+              ),
             ),
           ),
 

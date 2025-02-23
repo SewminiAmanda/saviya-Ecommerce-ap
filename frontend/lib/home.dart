@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'header.dart';
-import 'api_service.dart'; // Import the API service
+import 'api_service.dart'; 
+import 'category_page.dart';// Import the API service
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -166,19 +167,33 @@ class _HomePageState extends State<HomePage> {
                             return _buildCategoryItem(
                               'assets/images/default_category.jpeg',
                               categories[index]['categoryname'],
+                              categories[index]['categoryid'] ?? 2
                             );
                           },
                         ),
                       ),
+
+            SizedBox(height: 0), // Spacing
+
+            // Footer Section
+            _buildFooter(),
           ],
         ),
       ),
     );
   }
 
-  // Widget to build a category item
-  Widget _buildCategoryItem(String imageUrl, String categoryName) {
-    return Card(
+Widget _buildCategoryItem(String imageUrl, String categoryName, int categoryid) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CategoryPage(categoryName: categoryName, categoryid: categoryid),
+        ),
+      );
+    },
+    child: Card(
       elevation: 5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -203,8 +218,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+
 
   // Widget to build order status
   Widget _buildOrderStatus(IconData icon, String label) {
@@ -215,6 +233,62 @@ class _HomePageState extends State<HomePage> {
         SizedBox(height: 5),
         Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
       ],
+    );
+  }
+
+  // Footer Widget
+  Widget _buildFooter() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      color: Color(0xFFF39C12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Address Section
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "123 Street, Colombo, Sri Lanka",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                "contact@company.com",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+
+          // Social Media Section
+          Column(
+            children: [
+              Text(
+                "Follow Us",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 5),
+              Row(
+                children: [
+                  Icon(Icons.facebook, color: Colors.white, size: 24),
+                  SizedBox(width: 10),
+                  Icon(Icons.camera_alt, color: Colors.white, size: 24), // Instagram
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
