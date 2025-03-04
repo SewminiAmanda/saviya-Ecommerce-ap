@@ -17,10 +17,10 @@ const productController = {
       }
 
       // Get categoryId from retrieved category
-      const categoryId = category.category_id;
+      const categoryid = category.categoryid;
 
       // Create the product with the categoryId
-      const newProduct = await Product.create(productName, categoryId, price, image, quantity);
+      const newProduct = await Product.create(productName, categoryid, price, image, quantity);
 
       res.status(201).json({
         success: true,
@@ -105,7 +105,33 @@ const productController = {
     } catch (err) {
       res.status(500).json({ success: false, message: 'Error deleting product', error: err.message });
     }
+  },
+ // Get all products by category ID
+ getByCategoryId: async (req, res) => {
+  const { categoryid } = req.params;  // Fix variable name
+  try {
+      const products = await Product.getByCategoryId(categoryid);
+      if (products.length === 0) {
+          return res.status(404).json({
+              success: false,
+              message: 'No products found for this category'
+          });
+      }
+      res.status(200).json({
+          success: true,
+          products
+      });
+  } catch (err) {
+      console.error("Error fetching products by category:", err);
+      res.status(500).json({
+          success: false,
+          message: 'Error fetching products by category',
+          error: err.message
+      });
   }
+}
+
+
 
 };
 

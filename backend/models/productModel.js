@@ -63,8 +63,23 @@ const Product = {
     } catch (err) {
       throw err;
     }
-  }
+  },
+  getByCategoryId: async (categoryId) => {
+    const query = `SELECT * FROM product WHERE categoryId = $1 ORDER BY productId`;
+    try {
+        const res = await client.query(query, [categoryId]);
+        return res.rows;
+    } catch (err) {
+        console.error("Error in getByCategoryId:", err);
+        throw new Error("Database error while fetching products by category");
+    }
+}
 
 };
+
+
+ 
+
+
 
 module.exports = Product;
