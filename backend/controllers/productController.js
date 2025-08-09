@@ -4,9 +4,17 @@ const Category = require('../models/categoryModel');
 const productController = {
   // Create product
   create: async (req, res) => {
-    const { productName, categoryName, price, image, quantity } = req.body;
+    const { productName, categoryName, price, image, quantity, description, userId } = req.body;
 
     try {
+      // Validate required fields
+      if (!productName || !categoryName || !price || !quantity || !userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields: productName, categoryName, price, quantity, or userId'
+        });
+      }
+
       // Check if the category exists based on categoryName
       const category = await Category.getByName(categoryName);
       if (!category) {
@@ -16,11 +24,18 @@ const productController = {
         });
       }
 
-      // Get categoryId from retrieved category
-      const categoryid = category.categoryid;
+      const categoryId = category.categoryid;
 
-      // Create the product with the categoryId
-      const newProduct = await Product.create(productName, categoryid, price, image, quantity);
+      // Create product with an object
+      const newProduct = await Product.create({
+        productName,
+        categoryId,
+        price,
+        image,
+        quantity,
+        description,
+        userId
+      });
 
       res.status(201).json({
         success: true,
@@ -28,17 +43,25 @@ const productController = {
         product: newProduct
       });
     } catch (err) {
-      res.status(500).json({ success: false, message: 'Error creating product', error: err.message });
+      res.status(500).json({
+        success: false,
+        message: 'Error creating product',
+        error: err.message
+      });
     }
   },
 
   // Get all products
   getAll: async (req, res) => {
     try {
-      const products = await Product.getAll();
+      const products = await Product.findAll();
       res.status(200).json({ success: true, products });
     } catch (err) {
-      res.status(500).json({ success: false, message: 'Error fetching products', error: err.message });
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching products',
+        error: err.message
+      });
     }
   },
 
@@ -46,23 +69,30 @@ const productController = {
   getById: async (req, res) => {
     const { id } = req.params;
     try {
-      const product = await Product.getById(id);
+      const product = await Product.findByPk(id);
       if (!product) {
-        return res.status(404).json({ success: false, message: 'Product not found' });
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found'
+        });
       }
       res.status(200).json({ success: true, product });
     } catch (err) {
-      res.status(500).json({ success: false, message: 'Error fetching product', error: err.message });
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching product',
+        error: err.message
+      });
     }
   },
 
   // Update product
   update: async (req, res) => {
     const { id } = req.params;
-    const { productName, categoryName, price, image, quantity } = req.body;
+    const { productName, categoryName, price, image, quantity, description } = req.body;
 
     try {
-      // Check if the category exists based on categoryName
+      // Check if category exists
       const category = await Category.getByName(categoryName);
       if (!category) {
         return res.status(404).json({
@@ -70,22 +100,38 @@ const productController = {
           message: 'Category not found'
         });
       }
-      
-      // Get categoryId from retrieved category
+
       const categoryId = category.categoryid;
 
-      // Update the product with the new categoryId
-      const updatedProduct = await Product.update(id, productName, categoryId, price, image, quantity);
-      if (!updatedProduct) {
-        return res.status(404).json({ success: false, message: 'Product not found' });
+      // Find and update the product
+      const [updated] = await Product.update(
+        {
+          productName,
+          categoryId,
+          price,
+          image,
+          quantity,
+          description
+        },
+        { where: { productId: id } }
+      );
+
+      if (updated === 0) {
+        return res.status(404).json({ success: false, message: 'Product not found or no change detected' });
       }
+
+      const updatedProduct = await Product.findByPk(id);
       res.status(200).json({
         success: true,
         message: 'Product updated successfully',
         product: updatedProduct
       });
     } catch (err) {
-      res.status(500).json({ success: false, message: 'Error updating product', error: err.message });
+      res.status(500).json({
+        success: false,
+        message: 'Error updating product',
+        error: err.message
+      });
     }
   },
 
@@ -93,46 +139,54 @@ const productController = {
   delete: async (req, res) => {
     const { id } = req.params;
     try {
-      const deletedProduct = await Product.delete(id);
-      if (!deletedProduct) {
-        return res.status(404).json({ success: false, message: 'Product not found' });
+      const deleted = await Product.destroy({ where: { productId: id } });
+
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          message: 'Product not found'
+        });
       }
+
       res.status(200).json({
         success: true,
         message: 'Product deleted successfully',
-        productId: deletedProduct.product_id
+        productId: id
       });
     } catch (err) {
-      res.status(500).json({ success: false, message: 'Error deleting product', error: err.message });
+      res.status(500).json({
+        success: false,
+        message: 'Error deleting product',
+        error: err.message
+      });
     }
   },
- // Get all products by category ID
- getByCategoryId: async (req, res) => {
-  const { categoryid } = req.params;  // Fix variable name
-  try {
-      const products = await Product.getByCategoryId(categoryid);
-      if (products.length === 0) {
-          return res.status(404).json({
-              success: false,
-              message: 'No products found for this category'
-          });
-      }
-      res.status(200).json({
-          success: true,
-          products
-      });
-  } catch (err) {
-      console.error("Error fetching products by category:", err);
-      res.status(500).json({
+
+  // Get all products by category ID
+  getByCategoryId: async (req, res) => {
+    const { categoryid } = req.params;
+    try {
+      const products = await Product.findAll({ where: { categoryId: categoryid } });
+
+      if (!products || products.length === 0) {
+        return res.status(404).json({
           success: false,
-          message: 'Error fetching products by category',
-          error: err.message
+          message: 'No products found for this category'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        products
       });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching products by category',
+        error: err.message
+      });
+    }
   }
-}
-
-
-
 };
 
 module.exports = productController;

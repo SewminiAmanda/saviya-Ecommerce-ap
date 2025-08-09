@@ -1,93 +1,36 @@
-const client = require('../connection'); 
+// models/Category.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../connection'); // Your Sequelize instance
 
-const Category = {
-    create: async (categoryName, description) => {
-        const query = ` 
-        INSERT INTO category (categoryName, description) 
-        VALUES ($1, $2) 
-        RETURNING categoryId, categoryName, description`; 
-    
-        const values = [categoryName, description];
-
-        try {
-            const res = await client.query(query, values);
-            return res.rows[0];
-        } catch (err) {
-            console.error("Error creating category:", err);
-            throw err;
-        }
+const Category = sequelize.define('Category', {
+    categoryid: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
     },
-
-    findByName: async (categoryName) => {
-        const query = `SELECT * FROM category WHERE categoryName = $1`;
-        const values = [categoryName];
-
-        try {
-            const res = await client.query(query, values);
-            return res.rows[0] || null;
-        } catch (err) {
-            console.error("Error finding category:", err);
-            throw err;
-        }
+    categoryname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
     },
-
-     // READ: Get all categories
-     getAll: async () => {
-        const query = `SELECT * FROM category ORDER BY categoryId`;
-
-        try {
-            const res = await client.query(query);
-            return res.rows;
-        } catch (err) {
-            console.error("Error fetching categories:", err);
-            throw err;
-        }
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
     },
-    update: async (categoryId, categoryName, description) => {
-        const query = `
-        UPDATE category 
-        SET categoryName = $1, description = $2
-        WHERE categoryId = $3
-        RETURNING categoryId, categoryName, description`;
+    imageurl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+}, {
+    tableName: 'category',
+    timestamps: false, 
+}
 
-        const values = [categoryName, description, categoryId];
 
-        try {
-            const res = await client.query(query, values);
-            return res.rows[0] || null;
-        } catch (err) {
-            console.error("Error updating category:", err);
-            throw err;
-        }
-    },
 
-    delete: async (categoryId) => {
-        const query = `DELETE FROM category WHERE categoryId = $1 RETURNING categoryId`;
-
-        const values = [categoryId];
-
-        try {
-            const res = await client.query(query, values);
-            
-            return res.rows[0] ? true : false;
-        } catch (err) {
-            console.error("Error deleting category:", err);
-            throw err;
-        }
-    },
-
-    getByName: async (categoryName) => {
-        const query = 'SELECT categoryId FROM category WHERE categoryName = $1';
-        try {
-          const res = await client.query(query, [categoryName]);
-          categoryId = res.rows[0];
-          return categoryId ; // Return the category with its category_id
-         
-        } catch (err) {
-          throw err;
-        }
-      },
-
+);
+Category.getByName = async function (name) {
+  return await Category.findOne({ where: { categoryname: name } });
 };
 
 module.exports = Category;
