@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>TalkJS Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.talkjs.com/talk.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        #talkjs-container {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="talkjs-container"></div>
+
+    <script type="text/javascript">
+        Talk.ready.then(function () {
+
+            // Current logged-in user
+            const me = new Talk.User({
+                id: "123456", // unique user ID in your DB
+                name: "John Doe",
+                email: "john@example.com",
+                photoUrl: "https://randomuser.me/api/portraits/men/45.jpg",
+                welcomeMessage: "Hi! How can I help you?"
+            });
+
+            // The other participant
+            const other = new Talk.User({
+                id: "654321",
+                name: "Jane Smith",
+                email: "jane@example.com",
+                photoUrl: "https://randomuser.me/api/portraits/women/46.jpg",
+                welcomeMessage: "Hey there! How can I assist you?"
+            });
+
+            // Create a session with your TalkJS App ID
+            const session = new Talk.Session({
+                appId: "YOUR_TALKJS_APP_ID",
+                me: me
+            });
+
+            // Create or get the conversation
+            const conversation = session.getOrCreateConversation(Talk.oneOnOneId(me, other));
+            conversation.setParticipant(me);
+            conversation.setParticipant(other);
+
+            // Create and mount the chatbox
+            const chatbox = session.createChatbox(conversation);
+            chatbox.mount(document.getElementById("talkjs-container"));
+        });
+    </script>
+</body>
+
+</html>
