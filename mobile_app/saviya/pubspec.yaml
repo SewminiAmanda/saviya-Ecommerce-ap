@@ -48,6 +48,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   talkjs_flutter: ^0.15.1
   webview_flutter: ^4.4.1
+  flutter_dotenv: ^5.1.0
 
 
 

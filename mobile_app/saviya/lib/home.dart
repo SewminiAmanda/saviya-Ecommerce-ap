@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'header.dart';
+import 'components/header.dart';
 import 'services/api_service.dart';
 import 'category_page.dart';
 
@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(110),
+        preferredSize: Size.fromHeight(110),
         child: CustomHeader(),
       ),
       body: isLoading && userId == 0
@@ -181,77 +181,90 @@ class _HomePageState extends State<HomePage> {
           final imageUrl = (category['imageurl'] ?? '').toString().isNotEmpty
               ? category['imageurl']
               : 'assets/images/default_category.jpeg';
-          return _buildCategoryItem(
-            imageUrl: imageUrl,
-            categoryName: category['categoryname'] ?? 'Unnamed',
-            categoryid: category['categoryid'] ?? 0,
-            description: category['description'] ?? 'No description available.',
-            userId: int.tryParse(category['userId']?.toString() ?? '0') ?? 0,
+          final categoryName = category['categoryname'] ?? 'Unnamed';
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryPage(
+                    categoryName: categoryName,
+                    categoryid: category['categoryid'] ?? 0,
+                    imageurl: imageUrl,
+                    description:
+                        category['description'] ?? 'No description available.',
+                    sellerId:
+                        int.tryParse(category['userId']?.toString() ?? '0') ??
+                        0,
+                  ),
+                ),
+              );
+            },
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: imageUrl.startsWith('http')
+                        ? Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            width: 40,
+                            height: 40,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.image_not_supported, size: 40),
+                          )
+                        : Image.asset(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            width: 40,
+                            height: 40,
+                          ),
+                  ),
+                  const SizedBox(height: 5),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Text(
+                      categoryName,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
         },
       );
     }
   }
 
-  Widget _buildCategoryItem({
-    required String imageUrl,
-    required String categoryName,
-    required int categoryid,
-    required String description,
-    required int userId,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CategoryPage(
-              categoryName: categoryName,
-              categoryid: categoryid,
-              imageurl: imageUrl,
-              description: description,
-              sellerId: userId,
-            ),
-          ),
-        );
-      },
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: imageUrl.startsWith('http')
-                  ? Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      width: 40,
-                      height: 40,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.image_not_supported, size: 40),
-                    )
-                  : Image.asset(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      width: 40,
-                      height: 40,
-                    ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              categoryName,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildOrderStatusRow() {
+    final List<String> labels = [
+      'To Pay',
+      'To Ship',
+      'Shipped',
+      'To Review',
+      'Return',
+    ];
+    final List<IconData> icons = [
+      Icons.payment,
+      Icons.local_shipping,
+      Icons.delivery_dining,
+      Icons.rate_review,
+      Icons.keyboard_return,
+    ];
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 15),
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -269,28 +282,29 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildOrderStatus(Icons.payment, "To Pay"),
-          _buildOrderStatus(Icons.local_shipping, "To Ship"),
-          _buildOrderStatus(Icons.delivery_dining, "Shipped"),
-          _buildOrderStatus(Icons.rate_review, "To Review"),
-          _buildOrderStatus(Icons.keyboard_return, "Return"),
-        ],
+        children: List.generate(labels.length, (index) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icons[index], size: 30, color: const Color(0xFFF39C12)),
+              const SizedBox(height: 5),
+              SizedBox(
+                width: 60,
+                child: Text(
+                  labels[index],
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          );
+        }),
       ),
-    );
-  }
-
-  Widget _buildOrderStatus(IconData icon, String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 30, color: const Color(0xFFF39C12)),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        ),
-      ],
     );
   }
 

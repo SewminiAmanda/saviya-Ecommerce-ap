@@ -1,27 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'services/cart_service.dart';
+import 'services/order_service.dart';
+import 'cart.dart';
 import 'login_page.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Supabase.initialize(
-    url: 'https://fbkovdupdbumqkqrzeys.supabase.co', 
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZia292ZHVwZGJ1bXFrcXJ6ZXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExOTk0NjksImV4cCI6MjA2Njc3NTQ2OX0.q0-ylimYskgsyy-bihpJgEmTI_I4lY5dutMbPH1TLrU'
-    );
-  runApp(const MyApp());
+
+  await Supabase.initialize(
+    url: 'https://fbkovdupdbumqkqrzeys.supabase.co',
+    anonKey: 'YOUR_ANON_KEY',
+  );
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartService()..fetchCart()),
+        ChangeNotifierProvider(create: (_) => OrderService()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      title: 'MyDrive Shop',
+      theme: ThemeData(primarySwatch: Colors.orange),
+      home: const LoginPage(),
+      routes: {'/cart': (context) => const CartPage()},
     );
   }
 }

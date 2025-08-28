@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'header.dart';
-import 'product/product_card.dart';
+import 'components/header.dart';
+import 'components/product_card.dart';
 
 class CategoryPage extends StatefulWidget {
   final String categoryName;
   final int categoryid;
   final String imageurl;
   final String description;
-  final int sellerId; 
+  final int sellerId;
 
   const CategoryPage({
     super.key,
@@ -29,6 +29,7 @@ class _CategoryPageState extends State<CategoryPage> {
   List<dynamic> products = [];
   Map<int, String> sellerNames = {};
   bool isLoading = true;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -37,7 +38,13 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Future<void> fetchProducts() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
     try {
+      print('Fetching products for category ${widget.categoryid}');
       final response = await http.get(
         Uri.parse(
           'http://10.0.2.2:8080/api/product/category/${widget.categoryid}',
@@ -45,60 +52,96 @@ class _CategoryPageState extends State<CategoryPage> {
         headers: {"Content-Type": "application/json"},
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         final List<dynamic> fetchedProducts = decoded['products'] ?? [];
 
-        final userIds = fetchedProducts
-            .map((product) => int.tryParse(product['userId'].toString()))
+        print('Fetched ${fetchedProducts.length} products');
+        print(
+          'First product: ${fetchedProducts.isNotEmpty ? fetchedProducts[0] : "N/A"}',
+        );
+
+        // Temporary: Accept null IDs for debugging
+        final validProducts = fetchedProducts.where((product) {
+          final productId = product['productId'];
+          final userId = product['userId'];
+          print('Product ID: $productId, User ID: $userId');
+          return true; // Accept all products for now
+        }).toList();
+
+        if (validProducts.isEmpty) {
+          setState(() {
+            errorMessage = "No products available in this category";
+            isLoading = false;
+          });
+          return;
+        }
+
+        final userIds = validProducts
+            .map((product) => product['userId'] as int?)
             .whereType<int>()
             .toSet();
 
+        print('Unique user IDs: $userIds');
+
         final futures = userIds.map((id) async {
           try {
+            print('Fetching user details for ID: $id');
             final userResponse = await http.get(
               Uri.parse('http://10.0.2.2:8080/api/users/$id'),
               headers: {"Content-Type": "application/json"},
             );
-            print("User ID: $id, Response: ${userResponse.body}");
 
+            print('User response for $id: ${userResponse.statusCode}');
             if (userResponse.statusCode == 200) {
               final userJson = jsonDecode(userResponse.body);
-              final userData = userJson['user'];
+              final userData =
+                  userJson['user'] ?? userJson; // Try both structures
+              print('User data: $userData');
 
-              final sellerName =
-                  "${userData['first_name'] ?? ''} ${userData['last_name'] ?? ''}"
-                      .trim();
+              final firstName =
+                  userData['first_name'] ?? userData['firstName'] ?? '';
+              final lastName =
+                  userData['last_name'] ?? userData['lastName'] ?? '';
+              final sellerName = "$firstName $lastName".trim();
 
               return MapEntry(
                 id,
-                sellerName.isNotEmpty ? sellerName : 'Unknown Seller',
+                sellerName.isNotEmpty ? sellerName : 'Supplier $id',
               );
             } else {
-              return MapEntry(id, 'Unknown Seller');
+              return MapEntry(id, 'Supplier $id');
             }
           } catch (e) {
-            print("Error fetching user $id: $e");
-            return MapEntry(id, 'Unknown Seller');
+            print('Error fetching user $id: $e');
+            return MapEntry(id, 'Supplier $id');
           }
         });
 
         final results = await Future.wait(futures);
         final sellerMap = Map<int, String>.fromEntries(results);
 
+        print('Final seller map: $sellerMap');
+        print('Valid products count: ${validProducts.length}');
+
         setState(() {
-          products = fetchedProducts;
+          products = validProducts;
           sellerNames = sellerMap;
           isLoading = false;
         });
-        print("Products fetched: ${products.length}");
-        print("Sellers fetched: ${sellerNames.length}");
       } else {
-        throw Exception("Failed to fetch products");
+        setState(() {
+          errorMessage = "Failed to load products (${response.statusCode})";
+          isLoading = false;
+        });
       }
     } catch (e) {
-      print("Error fetching products: $e");
+      print('Error in fetchProducts: $e');
       setState(() {
+        errorMessage = "Connection error: ${e.toString()}";
         isLoading = false;
       });
     }
@@ -178,6 +221,11 @@ class _CategoryPageState extends State<CategoryPage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: fetchProducts,
+        tooltip: 'Refresh',
+        child: const Icon(Icons.refresh),
+      ),
     );
   }
 
@@ -213,36 +261,65 @@ class _CategoryPageState extends State<CategoryPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    if (errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(errorMessage!, textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: fetchProducts,
+              child: const Text("Retry"),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (products.isEmpty) {
-      return const Center(child: Text("No products available."));
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 50, color: Colors.grey),
+            SizedBox(height: 16),
+            Text("No products found", style: TextStyle(fontSize: 18)),
+            SizedBox(height: 8),
+            Text("Try another category or check back later"),
+          ],
+        ),
+      );
     }
 
     return ListView.builder(
       itemCount: products.length,
       itemBuilder: (context, index) {
         final product = products[index];
-        final userId = int.tryParse(product['userId'].toString()) ?? -1;
-        final sellerName = sellerNames.containsKey(userId)
-            ? sellerNames[userId]!
-            : 'Fetching...';
+        final productId = product['id'];
+        final userId = product['userId'];
+        final sellerName = sellerNames[userId] ?? 'Supplier $userId';
 
-        final imageUrl =
-            (product['image'] != null && product['image'].toString().isNotEmpty)
-            ? product['image']
-            : 'https://via.placeholder.com/90';
+        print('Building product card for index $index:');
+        print('Product ID: $productId');
+        print('User ID: $userId');
+        print('Product data: $product');
 
-        print(
-          "Product ID: ${product['id']}, User ID: $userId, Seller: $sellerName",
-        );
+        final imageUrl = (product['image']?.toString().isNotEmpty ?? false)
+            ? product['image'].toString()
+            : 'https://via.placeholder.com/150';
 
         return ProductCard(
-          productName: product['productName'] ?? 'Unknown Product',
+          productId: product['productId'],
+          productName: product['productName']?.toString() ?? 'Unnamed Product',
           price: product['price']?.toString() ?? '0',
           quantity: product['quantity']?.toString() ?? '0',
+          minQuantity: product['minQuantity'].toString(),
           sellerName: sellerName,
           imageUrl: imageUrl,
-          description: product['description'] ?? 'No description available.',
-          sellerId: userId,
+          description:
+              product['description']?.toString() ?? 'No description available.',
+          sellerId: userId ?? 0, // Temporary fallback for null user IDs
         );
       },
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'profile_page.dart';
+import '../home.dart';
+import '../profile_page.dart';
 
 class CustomHeader extends StatelessWidget {
   @override

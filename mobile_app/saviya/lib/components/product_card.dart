@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import './productDetails.dart';
+import '../product/productDetails.dart';
 
 class ProductCard extends StatelessWidget {
+  final int productId;
   final String productName;
   final String price;
   final String quantity;
+  final String minQuantity;
   final String sellerName;
   final String imageUrl;
   final String description;
   final int sellerId;
 
-
   const ProductCard({
     Key? key,
+    required this.productId,
     required this.productName,
     required this.price,
     required this.quantity,
+    required this.minQuantity,
     required this.sellerName,
     required this.imageUrl,
     required this.description,
@@ -24,23 +27,29 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Parse numeric values safely
+    final double parsedPrice = double.tryParse(price) ?? 0.0;
+    final int parsedQuantity = int.tryParse(quantity) ?? 0;
+    final int parsedMinQuantity = int.tryParse(minQuantity) ?? 1;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailsPage(
+              productId: productId,
               productName: productName,
-              price: price,
+              price: parsedPrice,
               description: description,
-              quantity: quantity,
+              quantity: parsedQuantity,
+              minQuantity: parsedMinQuantity,
               sellerName: sellerName,
               imageUrl: imageUrl,
               sellerId: sellerId,
             ),
           ),
         );
-        
       },
       child: Card(
         elevation: 4.0,
@@ -79,7 +88,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Price: $price',
+                      'Price: Rs. ${parsedPrice.toStringAsFixed(2)}',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.green,
@@ -88,7 +97,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Quantity: $quantity',
+                      'Quantity: $parsedQuantity',
                       style: const TextStyle(
                         fontSize: 15,
                         color: Colors.black87,

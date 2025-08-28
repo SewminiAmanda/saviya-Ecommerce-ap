@@ -1,30 +1,35 @@
 import 'package:flutter/material.dart';
-import '../chat/chat_page.dart'; // Make sure this import path is correct
-import '../header.dart';
+import 'package:provider/provider.dart';
+import '../components/header.dart';
+import '../services/cart_service.dart';
 
 class ProductDetailsPage extends StatelessWidget {
   final String productName;
-  final String price;
-  final String quantity;
+  final double price;
+  final int quantity;
+  final int minQuantity;
   final String sellerName;
   final String imageUrl;
   final String description;
   final int sellerId;
+  final int productId;
 
   const ProductDetailsPage({
     Key? key,
     required this.productName,
     required this.price,
     required this.quantity,
+    required this.minQuantity,
     required this.sellerName,
     required this.imageUrl,
     required this.description,
     required this.sellerId,
+    required this.productId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final String currentUserId = '123'; // Replace with actual logged-in user ID
+    final cartService = Provider.of<CartService>(context, listen: false);
 
     return Scaffold(
       body: SafeArea(
@@ -37,17 +42,18 @@ class ProductDetailsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Product Image
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         imageUrl,
                         height: 250,
-                        width: MediaQuery.of(context).size.width,
+                        width: double.infinity,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             height: 250,
-                            width: MediaQuery.of(context).size.width,
+                            width: double.infinity,
                             color: Colors.grey[300],
                             child: const Center(
                               child: Icon(Icons.broken_image, size: 60),
@@ -57,6 +63,8 @@ class ProductDetailsPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
+
+                    // Product Name
                     Center(
                       child: Text(
                         productName,
@@ -69,9 +77,9 @@ class ProductDetailsPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    // Price and Seller section
+                    // Price and Seller
                     Text(
-                      'Price: Rs. $price',
+                      'Price: Rs. ${price.toStringAsFixed(2)}',
                       style: const TextStyle(
                         fontSize: 18,
                         color: Colors.green,
@@ -79,57 +87,21 @@ class ProductDetailsPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Seller: $sellerName',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.blueGrey,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TalkJsChatPage(
-                                  currentUserId: currentUserId,
-                                  currentUserName: 'John Doe',
-                                  currentUserEmail: 'johndoe@example.com',
-                                  currentUserPhotoUrl:
-                                      'https://i.pravatar.cc/150?img=1',
-                                  otherUserId: sellerId.toString(),
-                                  otherUserName: sellerName,
-                                  otherUserEmail: '$sellerId@supplier.com',
-                                  otherUserPhotoUrl:
-                                      'https://i.pravatar.cc/150?img=2',
-                                ),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            'Contact Supplier',
-                            style: TextStyle(
-                              color: Colors.orange,
-                              decoration: TextDecoration.underline,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'Seller: $sellerName',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.blueGrey,
+                      ),
                     ),
-
                     const SizedBox(height: 10),
                     Text(
-                      'Quantity: $quantity',
+                      'Available Stock: $quantity',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 20),
 
+                    // Product Description
                     const Text(
                       'Product Description',
                       style: TextStyle(
@@ -141,14 +113,80 @@ class ProductDetailsPage extends StatelessWidget {
                     Text(description, style: const TextStyle(fontSize: 16)),
                     const SizedBox(height: 40),
 
-                    // Add To Cart Button
+                    // Add To Cart with quantity dialog
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Added to cart')),
+                        onPressed: () async {
+                          int? selectedQty = await showDialog<int>(
+                            context: context,
+                            builder: (context) {
+                              final TextEditingController qtyController =
+                                  TextEditingController(
+                                    text: minQuantity.toString(),
+                                  );
+
+                              return AlertDialog(
+                                title: const Text('Select Quantity'),
+                                content: TextField(
+                                  controller: qtyController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    hintText:
+                                        'Enter quantity (min $minQuantity)',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, null),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      final qty = int.tryParse(
+                                        qtyController.text.trim(),
+                                      );
+                                      if (qty == null ||
+                                          qty < minQuantity ||
+                                          qty > quantity) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text("Invalid quantity"),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      Navigator.pop(context, qty);
+                                    },
+                                    child: const Text('Add'),
+                                  ),
+                                ],
+                              );
+                            },
                           );
+
+                          if (selectedQty != null) {
+                            final success = await cartService.addToCart(
+                              productId,
+                              selectedQty,
+                            );
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("✅ Added to cart"),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("❌ Failed to add to cart"),
+                                ),
+                              );
+                            }
+                          }
                         },
                         icon: const Icon(
                           Icons.add_shopping_cart,
@@ -165,29 +203,6 @@ class ProductDetailsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
-
-                    // Buy Now Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Proceeding to buy now'),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.payment),
-                        label: const Text("Buy Now"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          textStyle: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-
                     const SizedBox(height: 20),
                   ],
                 ),
