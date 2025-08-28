@@ -140,6 +140,7 @@ class CartService with ChangeNotifier {
   /// Clear cart
   Future<bool> clearCart() async {
     _setLoading(true);
+    print("it hit here ");
     try {
       final token = await AuthService.getToken();
       if (token == null) throw Exception("No token found");

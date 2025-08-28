@@ -161,7 +161,8 @@ const removeFromCart = async (req, res) => {
 // Clear cart
 const clearCart = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user.userid;
+        console.log("userId cart :",userId);
 
         const cart = await Cart.findOne({ where: { userId } });
         if (!cart) {

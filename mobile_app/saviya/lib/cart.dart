@@ -123,7 +123,7 @@ class _CartPageState extends State<CartPage> {
 
                             // Call the placeOrder method
                             final success = await orderService.placeOrder(
-                              cartService.cartItems,
+                              cartService.cartItems
                             );
 
                             if (success) {
@@ -150,7 +150,7 @@ class _CartPageState extends State<CartPage> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text("Pay with PayHere (Sandbox)"),
+                        : const Text("Place Order"),
                   ),
                 ],
               ),
