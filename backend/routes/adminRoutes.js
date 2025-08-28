@@ -9,5 +9,6 @@ router.post('/login', AdminController.login);
 router.get('/adminuser', authenticate, AdminController.getCurrentAdmin);     
 router.put('/admin/update/:id', authenticate, AdminController.updateAdmin);
 router.delete('/admin/delete/:id', authenticate, AdminController.deleteAdmin);
+router.post('/invite', authenticate, AdminController.inviteAdmin);
 
 module.exports = router;

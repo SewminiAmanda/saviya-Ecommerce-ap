@@ -20,7 +20,7 @@ const Categories = () => {
 
   return (
     <div className="flex flex-col items-center p-6 w-full">
-      <h1 className="text-2xl font-bold mb-2">Saviya B2B E-Commerce Application</h1>
+      <h1 className="text-2xl font-bold mb-2">Saviya B2B E-Commerce Application Admin Panel</h1>
       <div className="bg-[#565449] h-1 w-full mb-6"></div>
 
       <div className="flex justify-between items-center w-full max-w-2xl mb-4 px-2">
@@ -33,7 +33,7 @@ const Categories = () => {
           <CategoryCard
             key={category.categoryid}
             category={category}
-            onUpdate={fetchCategories} // Keep this for refreshing after edit
+            onUpdate={fetchCategories} 
           // Removed onDelete prop
           />
         ))}

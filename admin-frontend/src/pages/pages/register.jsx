@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import { TextField, Typography, Container, Box } from '@mui/material';
+import { TextField, Typography, Container, Box, Button } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    username: '',
     email: '',
-    password: '',
-    confirmPassword: '',
   });
-
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -19,16 +15,16 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.username) newErrors.username = 'Username is required';
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email format';
-    if (!formData.password) newErrors.password = 'Password is required';
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -38,25 +34,37 @@ const Register = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const payload = {
-      user_name: formData.username,
-      email: formData.email,
-      password: formData.password,
-    };
-
     try {
-      await axios.post('http://localhost:8080/api/admin/register', payload);
-      setSuccess(true);
-      setError('');
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-      });
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        setError('Authentication required. Please login first.');
+        return;
+      }
+
+      // Call backend to create admin and send invite email
+      const response = await axios.post(
+        'http://localhost:8080/api/admin/invite', 
+        {
+          email: formData.email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setSuccess(true);
+        setError('');
+        setFormData({ email: '' });
+        alert(`Admin added successfully! An invite email has been sent to ${formData.email}.`);
+      } else {
+        setError(response.data.message || 'Failed to add admin.');
+      }
     } catch (err) {
-      console.error('Registration failed:', err);
-      setError('Failed to register. Try again.');
+      console.error('Failed to add admin:', err);
+      setError(err.response?.data?.message || 'Failed to add admin. Try again.');
       setSuccess(false);
     }
   };
@@ -75,16 +83,6 @@ const Register = () => {
           </Typography>
           <form onSubmit={handleSubmit}>
             <TextField
-              label="Username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              error={!!errors.username}
-              helperText={errors.username}
-            />
-            <TextField
               label="Email"
               name="email"
               type="email"
@@ -94,39 +92,25 @@ const Register = () => {
               margin="normal"
               error={!!errors.email}
               helperText={errors.email}
-            />
-            <TextField
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              error={!!errors.password}
-              helperText={errors.password}
-            />
-            <TextField
-              label="Confirm Password"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword}
+              required
             />
 
-            <button
+            <Button
               type="submit"
-              className="w-full py-2 mt-5 bg-black text-white rounded hover:bg-gray-800 transition"
+              variant="contained"
+              color="primary"
+              fullWidth
+              className="mt-5"
             >
               Add Admin
-            </button>
+            </Button>
 
             {error && <p className="text-red-500 mt-2">{error}</p>}
-            {success && <p className="text-green-600 mt-2">Registration successful!</p>}
+            {success && (
+              <p className="text-green-600 mt-2">
+                Admin added successfully! Invite email sent.
+              </p>
+            )}
           </form>
         </Box>
       </Container>

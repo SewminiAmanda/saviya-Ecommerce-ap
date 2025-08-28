@@ -10,6 +10,7 @@ export const login = async (email, password) => {
   if (!response.ok) throw new Error('Login failed');
   const data = await response.json();
   localStorage.setItem('adminToken', data.token);
+  localStorage.setItem('userId', data.token.user.userId);
   return data;
 };
 

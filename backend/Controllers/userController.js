@@ -55,7 +55,7 @@ const UserController = {
       const user = await User.findByEmail(email);
       if (user && await bcrypt.compare(password, user.password)) {
         // Generate token with 30 minutes expiration
-        const token = jwt.sign({ userid: user.userid, email: user.email }, SECRET_KEY, { expiresIn: '30m' });
+        const token = jwt.sign({ userid: user.userid, email: user.email }, SECRET_KEY, { expiresIn: '12h' });
 
         res.status(200).json({
           success: true,

@@ -15,13 +15,12 @@ const LoginPage = () => {
     }
   }, [navigate]);
 
-  // Inline login function
+  // In your LoginPage.jsx, change the API endpoint:
   const login = async (email, password) => {
-    const response = await fetch(`${API_URL}/api/admin/login`, {
+    const response = await fetch(`${API_URL}/api/admin/login`, { // Changed from /api/admin/login to /api/auth/login
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
-      
     });
 
     if (!response.ok) {
