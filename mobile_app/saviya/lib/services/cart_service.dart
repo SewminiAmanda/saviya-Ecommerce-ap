@@ -38,7 +38,7 @@ class CartService with ChangeNotifier {
         final items = data['items'] as List<dynamic>? ?? [];
         _cartItems = items.map((item) => CartItem.fromJson(item)).toList();
         notifyListeners();
-} else {
+      } else {
         throw Exception('Failed to fetch cart: ${response.statusCode}');
       }
     } catch (e) {

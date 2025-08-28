@@ -3,8 +3,11 @@ import '../home.dart';
 import '../profile_page.dart';
 
 class CustomHeader extends StatelessWidget {
+  const CustomHeader({super.key});
+
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 4),
       height: 110,
@@ -17,42 +20,44 @@ class CustomHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left side - Menu icon
+          // Left - Menu icon
           IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
 
-          // Center - Enlarged Logo (Shifted Right)
+          // Center - Logo
           GestureDetector(
             onTap: () {
-              // Directly navigate to HomePage when logo is clicked
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
             },
             child: Padding(
-              padding: const EdgeInsets.only(
-                left: 20,
-              ), // Moves the logo to the right
+              padding: const EdgeInsets.only(left: 20),
               child: Image.asset('assets/images/logo.png', height: 100),
             ),
           ),
 
-          // Right side - Icons
+          // Right - Icons
           Row(
             children: [
               IconButton(icon: const Icon(Icons.search), onPressed: () {}),
               IconButton(
                 icon: const Icon(Icons.shopping_cart),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, '/cart');
+                },
               ),
+
+              // Translate Icon
               IconButton(
-                icon: const Icon(Icons.message),
-                onPressed: () {},
+                icon: const Icon(Icons.translate),
+                onPressed: () {
+                },
               ),
+
               IconButton(
                 icon: const Icon(Icons.person),
                 onPressed: () {
-                  // Navigate to ProfilePage when the profile icon is clicked
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ProfilePage()),
