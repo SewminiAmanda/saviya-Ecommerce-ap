@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../home.dart';
 import '../profile_page.dart';
-
 
 class CustomHeader extends StatelessWidget {
   const CustomHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 4),
+      padding: const EdgeInsets.only(left: 0, right: 16, top: 4),
       height: 110,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -21,15 +20,12 @@ class CustomHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left - Menu icon
-          IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
-
           // Center - Logo
           GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HomePage()),
+                MaterialPageRoute(builder: (context) => const HomePage()),
               );
             },
             child: Padding(
@@ -41,19 +37,31 @@ class CustomHeader extends StatelessWidget {
           // Right - Icons
           Row(
             children: [
-              IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+              IconButton(icon: const Icon(Icons.search), onPressed: () {},
+              tooltip: 'search'.tr(),
+              ),
+
               IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
                   Navigator.pushNamed(context, '/cart');
                 },
+                tooltip: 'cart'.tr(),
               ),
 
-              // Translate Icon
-              IconButton(
+              // Language switcher
+              PopupMenuButton<String>(
                 icon: const Icon(Icons.translate),
-                onPressed: () {
+                onSelected: (String lang) {
+                  // Change the app locale
+                  context.setLocale(Locale(lang));
                 },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'en', child: Text("English")),
+                  PopupMenuItem(value: 'si', child: Text("සිංහල")),
+                  PopupMenuItem(value: 'ta', child: Text("தமிழ்")),
+                ],
+                
               ),
 
               IconButton(
@@ -61,9 +69,12 @@ class CustomHeader extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ProfilePage()),
+                    MaterialPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
                   );
                 },
+                tooltip: 'profile'.tr(),
               ),
             ],
           ),

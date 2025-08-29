@@ -10,7 +10,8 @@ class OrderService with ChangeNotifier {
 
   bool get isPlacing => _isPlacing;
 
-  Future<bool> placeOrder(List<CartItem> items) async {
+  // Return the created order instead of bool
+  Future<Map<String, dynamic>?> placeOrder(List<CartItem> items) async {
     _isPlacing = true;
     notifyListeners();
 
@@ -40,15 +41,16 @@ class OrderService with ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        _isPlacing = false;
-        notifyListeners();
-        return true;
+        final orderData = jsonDecode(response.body);
+        print(orderData);
+        return orderData; 
       }
+
       debugPrint("Place order failed: ${response.body}");
-      return false;
+      return null;
     } catch (e) {
       debugPrint("Place order error: $e");
-      return false;
+      return null;
     } finally {
       _isPlacing = false;
       notifyListeners();

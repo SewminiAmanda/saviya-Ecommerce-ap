@@ -19,12 +19,12 @@ const AdminController = {
       }
 
       const tempPassword = generateTempPassword();
-      const hashedPassword = await bcrypt.hash(tempPassword, 10);
+      console.log("tempory password is",tempPassword);
 
       // Create admin with minimal data
       const newAdmin = await Admin.create({
         email,
-        password: hashedPassword,
+        password: tempPassword,
         role: 'ADMIN',
         isFirstLogin: true,
         user_name: email.split('@')[0], // Default username from email
@@ -48,24 +48,6 @@ const AdminController = {
         message: 'Failed to invite admin',
         error: error.message
       });
-    }
-  },
-
-  // 👉 Regular Signup (if needed)
-  signup: async (req, res) => {
-    try {
-      const { user_name, email, password, profile_picture } = req.body;
-
-      const existingUser = await Admin.findByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: 'Email already in use.' });
-      }
-
-      await Admin.create({ user_name, email, password, profile_picture });
-      res.status(201).json({ message: 'Admin registered successfully.' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error during signup.' });
     }
   },
 

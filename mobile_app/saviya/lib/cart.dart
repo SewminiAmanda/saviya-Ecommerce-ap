@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../services/cart_service.dart';
 import '../services/order_service.dart';
 import 'components/header.dart';
+import '../order/invoice.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({Key? key}) : super(key: key);
@@ -15,7 +17,6 @@ class _CartPageState extends State<CartPage> {
   @override
   void initState() {
     super.initState();
-    // fetch cart immediately when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CartService>(context, listen: false).fetchCart();
     });
@@ -26,7 +27,7 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       body: Column(
         children: [
-          CustomHeader(),
+          const CustomHeader(),
           Expanded(
             child: Consumer<CartService>(
               builder: (context, cartService, child) {
@@ -35,7 +36,7 @@ class _CartPageState extends State<CartPage> {
                 }
 
                 if (cartService.cartItems.isEmpty) {
-                  return const Center(child: Text("Your cart is empty"));
+                  return Center(child: Text("cart_empty".tr()));
                 }
 
                 return ListView.builder(
@@ -50,7 +51,12 @@ class _CartPageState extends State<CartPage> {
                       child: ListTile(
                         title: Text(item.name),
                         subtitle: Text(
-                          "Qty: ${item.quantity} • Rs.${item.price.toStringAsFixed(2)}",
+                          "qty_price".tr(
+                            args: [
+                              item.quantity.toString(),
+                              item.price.toStringAsFixed(2),
+                            ],
+                          ),
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -102,7 +108,9 @@ class _CartPageState extends State<CartPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    "Total: Rs.${cartService.total.toStringAsFixed(2)}",
+                    "total_price".tr(
+                      args: [cartService.total.toStringAsFixed(2)],
+                    ),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -116,28 +124,26 @@ class _CartPageState extends State<CartPage> {
                         : () async {
                             if (cartService.cartItems.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Cart is empty!")),
+                                SnackBar(content: Text("cart_empty".tr())),
                               );
                               return;
                             }
 
-                            // Call the placeOrder method
-                            final success = await orderService.placeOrder(
-                              cartService.cartItems
+                            final orderData = await orderService.placeOrder(
+                              cartService.cartItems,
                             );
 
-                            if (success) {
+                            if (orderData != null) {
                               cartService.clearCart();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Order placed successfully!"),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => InvoicePage(order: orderData),
                                 ),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Failed to place order."),
-                                ),
+                                SnackBar(content: Text("order_failed".tr())),
                               );
                             }
                           },
@@ -150,7 +156,7 @@ class _CartPageState extends State<CartPage> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text("Place Order"),
+                        : Text("place_order".tr()),
                   ),
                 ],
               ),

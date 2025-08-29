@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart'; // ✅ import
 import 'upload_verification_page.dart';
 import 'product/add_product.dart';
 import '../services/product_service.dart';
@@ -53,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text('profile'.tr()), // ✅ translated
         backgroundColor: Colors.orange,
       ),
       body: Column(
@@ -105,7 +106,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     const Icon(Icons.shopping_bag_outlined, color: Colors.grey),
                     const SizedBox(width: 5),
                     Text(
-                      '$productCount products',
+                      // ✅ dynamic variable inside translation
+                      'products_count'.tr(args: [productCount.toString()]),
                       style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                     ),
                   ],
@@ -120,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     if (userId == null || userId == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("User ID not found.")),
+                        SnackBar(content: Text("user_id_not_found".tr())),
                       );
                       return;
                     }
@@ -144,11 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            "Your verification was rejected or blocked.",
-                          ),
-                        ),
+                        SnackBar(content: Text("verification_rejected".tr())),
                       );
                     }
                   },
@@ -164,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                "Recent Added Products",
+                "recent_added_products".tr(),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

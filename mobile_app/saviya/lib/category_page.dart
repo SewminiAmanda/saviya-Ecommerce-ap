@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'components/header.dart';
 import 'components/product_card.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CategoryPage extends StatefulWidget {
   final String categoryName;
@@ -44,7 +45,6 @@ class _CategoryPageState extends State<CategoryPage> {
     });
 
     try {
-      print('Fetching products for category ${widget.categoryid}');
       final response = await http.get(
         Uri.parse(
           'http://10.0.2.2:8080/api/product/category/${widget.categoryid}',
@@ -52,55 +52,33 @@ class _CategoryPageState extends State<CategoryPage> {
         headers: {"Content-Type": "application/json"},
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         final List<dynamic> fetchedProducts = decoded['products'] ?? [];
 
-        print('Fetched ${fetchedProducts.length} products');
-        print(
-          'First product: ${fetchedProducts.isNotEmpty ? fetchedProducts[0] : "N/A"}',
-        );
-
-        // Temporary: Accept null IDs for debugging
-        final validProducts = fetchedProducts.where((product) {
-          final productId = product['productId'];
-          final userId = product['userId'];
-          print('Product ID: $productId, User ID: $userId');
-          return true; // Accept all products for now
-        }).toList();
-
-        if (validProducts.isEmpty) {
+        if (fetchedProducts.isEmpty) {
           setState(() {
-            errorMessage = "No products available in this category";
+            errorMessage = "no_products_available".tr();
             isLoading = false;
           });
           return;
         }
 
-        final userIds = validProducts
+        final userIds = fetchedProducts
             .map((product) => product['userId'] as int?)
             .whereType<int>()
             .toSet();
 
-        print('Unique user IDs: $userIds');
-
         final futures = userIds.map((id) async {
           try {
-            print('Fetching user details for ID: $id');
             final userResponse = await http.get(
               Uri.parse('http://10.0.2.2:8080/api/users/$id'),
               headers: {"Content-Type": "application/json"},
             );
 
-            print('User response for $id: ${userResponse.statusCode}');
             if (userResponse.statusCode == 200) {
               final userJson = jsonDecode(userResponse.body);
-              final userData =
-                  userJson['user'] ?? userJson; // Try both structures
-              print('User data: $userData');
+              final userData = userJson['user'] ?? userJson;
 
               final firstName =
                   userData['first_name'] ?? userData['firstName'] ?? '';
@@ -110,38 +88,37 @@ class _CategoryPageState extends State<CategoryPage> {
 
               return MapEntry(
                 id,
-                sellerName.isNotEmpty ? sellerName : 'Supplier $id',
+                sellerName.isNotEmpty
+                    ? sellerName
+                    : 'supplier'.tr(args: [id.toString()]),
               );
             } else {
-              return MapEntry(id, 'Supplier $id');
+              return MapEntry(id, 'Supplier'.tr(args: [id.toString()]));
             }
           } catch (e) {
-            print('Error fetching user $id: $e');
-            return MapEntry(id, 'Supplier $id');
+            return MapEntry(id, 'supplier'.tr(args: [id.toString()]));
           }
         });
 
         final results = await Future.wait(futures);
         final sellerMap = Map<int, String>.fromEntries(results);
 
-        print('Final seller map: $sellerMap');
-        print('Valid products count: ${validProducts.length}');
-
         setState(() {
-          products = validProducts;
+          products = fetchedProducts;
           sellerNames = sellerMap;
           isLoading = false;
         });
       } else {
         setState(() {
-          errorMessage = "Failed to load products (${response.statusCode})";
+          errorMessage = "failed_to_load_products".tr(
+            args: [response.statusCode.toString()],
+          );
           isLoading = false;
         });
       }
     } catch (e) {
-      print('Error in fetchProducts: $e');
       setState(() {
-        errorMessage = "Connection error: ${e.toString()}";
+        errorMessage = "connection_error".tr(args: [e.toString()]);
         isLoading = false;
       });
     }
@@ -152,7 +129,7 @@ class _CategoryPageState extends State<CategoryPage> {
     return Scaffold(
       body: Column(
         children: [
-          CustomHeader(),
+          const CustomHeader(),
           Expanded(
             child: Stack(
               children: [
@@ -172,8 +149,12 @@ class _CategoryPageState extends State<CategoryPage> {
                         return Container(
                           height: 390,
                           color: Colors.grey[300],
-                          child: const Center(
-                            child: Icon(Icons.broken_image, size: 60),
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 60,
+                              color: Colors.grey[700],
+                            ),
                           ),
                         );
                       },
@@ -198,18 +179,18 @@ class _CategoryPageState extends State<CategoryPage> {
                       const SizedBox(height: 30),
                       Row(
                         children: [
-                          _buildTab("Products", true),
+                          _buildTab("products".tr(), true),
                           const SizedBox(width: 150),
-                          _buildTab("Sellers", false),
+                          _buildTab("sellers".tr(), false),
                         ],
                       ),
                       const SizedBox(height: 20),
                       Expanded(
                         child: showProducts
                             ? _buildProductList()
-                            : const Center(
+                            : Center(
                                 child: Text(
-                                  "Sellers List not implemented yet.",
+                                  "sellers_list_not_implemented".tr(),
                                 ),
                               ),
                       ),
@@ -223,7 +204,7 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: fetchProducts,
-        tooltip: 'Refresh',
+        tooltip: 'refresh'.tr(),
         child: const Icon(Icons.refresh),
       ),
     );
@@ -268,25 +249,25 @@ class _CategoryPageState extends State<CategoryPage> {
           children: [
             Text(errorMessage!, textAlign: TextAlign.center),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: fetchProducts,
-              child: const Text("Retry"),
-            ),
+            ElevatedButton(onPressed: fetchProducts, child: Text("retry".tr())),
           ],
         ),
       );
     }
 
     if (products.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 50, color: Colors.grey),
-            SizedBox(height: 16),
-            Text("No products found", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
-            Text("Try another category or check back later"),
+            Icon(Icons.search_off, size: 50, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              "no_products_found".tr(),
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            Text("try_another_category".tr()),
           ],
         ),
       );
@@ -296,30 +277,27 @@ class _CategoryPageState extends State<CategoryPage> {
       itemCount: products.length,
       itemBuilder: (context, index) {
         final product = products[index];
-        final productId = product['id'];
-        final userId = product['userId'];
-        final sellerName = sellerNames[userId] ?? 'Supplier $userId';
-
-        print('Building product card for index $index:');
-        print('Product ID: $productId');
-        print('User ID: $userId');
-        print('Product data: $product');
+        final productId = product['productId'] ?? 0;
+        final userId = product['userId'] ?? 0;
+        final sellerName =
+            sellerNames[userId] ?? 'supplier'.tr(args: [userId.toString()]);
 
         final imageUrl = (product['image']?.toString().isNotEmpty ?? false)
             ? product['image'].toString()
             : 'https://via.placeholder.com/150';
 
         return ProductCard(
-          productId: product['productId'],
-          productName: product['productName']?.toString() ?? 'Unnamed Product',
+          productId: productId,
+          productName:
+              product['productName']?.toString() ?? 'unnamed_product'.tr(),
           price: product['price']?.toString() ?? '0',
           quantity: product['quantity']?.toString() ?? '0',
-          minQuantity: product['minQuantity'].toString(),
+          minQuantity: product['minQuantity']?.toString() ?? '1',
           sellerName: sellerName,
           imageUrl: imageUrl,
           description:
-              product['description']?.toString() ?? 'No description available.',
-          sellerId: userId ?? 0, // Temporary fallback for null user IDs
+              product['description']?.toString() ?? 'no_description'.tr(),
+          sellerId: userId,
         );
       },
     );

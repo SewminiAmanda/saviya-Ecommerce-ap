@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 final supabase = Supabase.instance.client;
 
@@ -61,12 +62,11 @@ class _AddProductPageState extends State<AddProductPage> {
   Future<File> loadFile(String path) async => File(path);
 
   Future<void> pickAndUploadFile() async {
-    // Request runtime permissions (for Android 13+ and below)
     final status = await Permission.photos.request();
     if (!status.isGranted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Photo permission is required.")));
+      ).showSnackBar(SnackBar(content: Text('photo_permission_required'.tr())));
       return;
     }
 
@@ -75,10 +75,7 @@ class _AddProductPageState extends State<AddProductPage> {
       allowMultiple: false,
     );
 
-    if (result == null || result.files.single.path == null) {
-      print("No file selected.");
-      return;
-    }
+    if (result == null || result.files.single.path == null) return;
 
     setState(() {
       isUploading = true;
@@ -94,9 +91,7 @@ class _AddProductPageState extends State<AddProductPage> {
           .from('products')
           .upload(fileName, file);
 
-      if (uploadedPath.isEmpty) {
-        throw Exception('Upload failed or empty path');
-      }
+      if (uploadedPath.isEmpty) throw Exception('Upload failed');
 
       final publicUrl = supabase.storage
           .from('products')
@@ -108,33 +103,26 @@ class _AddProductPageState extends State<AddProductPage> {
           isUploading = false;
         });
       }
-
-      print("Uploaded image URL: $imageUrl");
     } catch (e) {
-      print('Exception during file upload: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('File upload failed: $e')));
-      if (mounted) {
-        setState(() => isUploading = false);
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('file_upload_failed'.tr(args: [e.toString()]))),
+      );
+      if (mounted) setState(() => isUploading = false);
     }
   }
 
   Future<void> submitProduct() async {
     if (!_formKey.currentState!.validate() || selectedCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all required fields')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('fill_all_fields'.tr())));
       return;
     }
 
     if (isUploading) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please wait for the image to finish uploading'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('wait_image_upload'.tr())));
       return;
     }
 
@@ -158,19 +146,17 @@ class _AddProductPageState extends State<AddProductPage> {
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Product added successfully')));
+        ).showSnackBar(SnackBar(content: Text('product_added_success'.tr())));
         Navigator.pop(context);
       } else {
-        print(response.body);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to add product')));
+        ).showSnackBar(SnackBar(content: Text('failed_add_product'.tr())));
       }
     } catch (e) {
-      print('Error submitting product: $e');
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error submitting product')));
+      ).showSnackBar(SnackBar(content: Text('error_submitting_product'.tr())));
     }
   }
 
@@ -179,7 +165,7 @@ class _AddProductPageState extends State<AddProductPage> {
     final orange = Colors.orange;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Add New Product'), backgroundColor: orange),
+      appBar: AppBar(title: Text('add_product'.tr()), backgroundColor: orange),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -188,23 +174,23 @@ class _AddProductPageState extends State<AddProductPage> {
             children: [
               TextFormField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Product Name'),
+                decoration: InputDecoration(labelText: 'product_name'.tr()),
                 validator: (value) =>
-                    value!.isEmpty ? 'Enter product name' : null,
+                    value!.isEmpty ? 'enter_product_name'.tr() : null,
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: descController,
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: InputDecoration(labelText: 'description'.tr()),
                 validator: (value) =>
-                    value!.isEmpty ? 'Enter description' : null,
+                    value!.isEmpty ? 'enter_description'.tr() : null,
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               categories.isEmpty
-                  ? Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator())
                   : DropdownButtonFormField<String>(
                       value: selectedCategory,
-                      hint: Text('Select Category'),
+                      hint: Text('select_category'.tr()),
                       items: categories.map<DropdownMenuItem<String>>((cat) {
                         return DropdownMenuItem(
                           value: cat['categoryname'],
@@ -214,19 +200,19 @@ class _AddProductPageState extends State<AddProductPage> {
                       onChanged: (value) =>
                           setState(() => selectedCategory = value),
                       validator: (value) =>
-                          value == null ? 'Select category' : null,
+                          value == null ? 'select_category_error'.tr() : null,
                     ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               OutlinedButton.icon(
                 icon: isUploading
-                    ? SizedBox(
+                    ? const SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Icon(Icons.upload),
+                    : const Icon(Icons.upload),
                 label: Text(
-                  isUploading ? 'Uploading...' : 'Pick & Upload Image',
+                  isUploading ? 'uploading'.tr() : 'pick_upload_image'.tr(),
                 ),
                 onPressed: isUploading ? null : pickAndUploadFile,
               ),
@@ -238,35 +224,40 @@ class _AddProductPageState extends State<AddProductPage> {
                     height: 150,
                     loadingBuilder: (context, child, progress) {
                       if (progress == null) return child;
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     },
                     errorBuilder: (context, error, stackTrace) =>
-                        Text('Failed to load image'),
+                        Text('failed_load_image'.tr()),
                   ),
                 ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: priceController,
-                decoration: InputDecoration(labelText: 'Base Price'),
+                decoration: InputDecoration(labelText: 'base_price'.tr()),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Enter price' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'enter_price'.tr() : null,
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: quantityController,
-                decoration: InputDecoration(labelText: 'Quantity'),
+                decoration: InputDecoration(labelText: 'quantity'.tr()),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Enter quantity' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'enter_quantity'.tr() : null,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: orange,
                   side: BorderSide(color: orange),
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: submitProduct,
-                child: Text('Add Product', style: TextStyle(fontSize: 16)),
+                child: Text(
+                  'add_product_btn'.tr(),
+                  style: const TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),

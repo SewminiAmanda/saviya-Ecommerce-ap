@@ -40,8 +40,8 @@ const OrderItem = sequelize.define(
     }
 );
 
-// Associations
-Order.hasMany(OrderItem, { foreignKey: "orderId" });
-OrderItem.belongsTo(Order, { foreignKey: "orderId" });
+Order.hasMany(OrderItem, { foreignKey: "orderId", as: "OrderItems" });
+OrderItem.belongsTo(Order, { foreignKey: "orderId", as: "order" });
+
 
 module.exports = OrderItem;

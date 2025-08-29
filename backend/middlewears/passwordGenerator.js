@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 function generateTempPassword() {
-    return crypto.randomBytes(4).toString('hex'); // 8-char temp password
+    return crypto.randomBytes(4).toString('hex'); 
 }
 
 module.exports = { generateTempPassword };
