@@ -13,16 +13,26 @@ class OrderItem {
     required this.price,
   });
 
-  factory OrderItem.fromJson(Map<String, dynamic> json) {
+factory OrderItem.fromJson(Map<String, dynamic> json) {
+    String productName = '';
+
+    if (json['name'] != null) {
+      productName = json['name'];
+    } else if (json['product'] != null &&
+        json['product']['productName'] != null) {
+      productName = json['product']['productName'];
+    } else {
+      productName = 'Product #${json['productId']}';
+    }
+
     return OrderItem(
-      id: json['id'],
+      id: json['id'] ?? json['orderItemId'] ?? 0,
       productId: json['productId'],
-      name:
-          json['name'] ??
-          json['productName'] ??
-          'Product #${json['productId']}',
+      name: productName,
       quantity: json['quantity'] ?? 0,
       price: (json['price'] as num?)?.toDouble() ?? 0,
     );
   }
+
+
 }

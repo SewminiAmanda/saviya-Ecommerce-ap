@@ -42,8 +42,8 @@ class OrderService with ChangeNotifier {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final orderData = jsonDecode(response.body);
-        print(orderData);
-        return orderData; 
+        debugPrint('order body: ${response.body}');
+        return orderData['order']; 
       }
 
       debugPrint("Place order failed: ${response.body}");

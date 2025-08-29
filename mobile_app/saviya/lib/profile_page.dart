@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:easy_localization/easy_localization.dart'; // ✅ import
+import 'package:easy_localization/easy_localization.dart';
 import 'upload_verification_page.dart';
 import 'product/add_product.dart';
 import '../services/product_service.dart';
+import '../components/change_address_modal.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -54,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('profile'.tr()), // ✅ translated
+        title: Text('Profile'.tr()), // static translation
         backgroundColor: Colors.orange,
       ),
       body: Column(
@@ -106,11 +107,24 @@ class _ProfilePageState extends State<ProfilePage> {
                     const Icon(Icons.shopping_bag_outlined, color: Colors.grey),
                     const SizedBox(width: 5),
                     Text(
-                      // ✅ dynamic variable inside translation
-                      'products_count'.tr(args: [productCount.toString()]),
+                      'Products', // static text only
                       style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                     ),
                   ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.location_on, color: Colors.grey),
+                  tooltip: 'Change Address'.tr(), // static translation
+                  onPressed: () {
+                    if (userId == null || userId == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("User ID not found".tr())),
+                      );
+                      return;
+                    }
+
+                    UpdateAddressModal(userId: userId!).show(context);
+                  },
                 ),
                 IconButton(
                   icon: Icon(Icons.add, color: Colors.grey[700]),
@@ -122,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     if (userId == null || userId == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("user_id_not_found".tr())),
+                        SnackBar(content: Text("User ID not found".tr())),
                       );
                       return;
                     }
@@ -146,7 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("verification_rejected".tr())),
+                        SnackBar(content: Text("Verification Rejected".tr())),
                       );
                     }
                   },
@@ -162,7 +176,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                "recent_added_products".tr(),
+                "Recent Added Products".tr(), // static translation
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

@@ -10,7 +10,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Ensure EasyLocalization is initialized
   await EasyLocalization.ensureInitialized();
 
   await Supabase.initialize(
@@ -22,7 +21,7 @@ void main() async {
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('si'), Locale('ta')],
-      path: 'assets/translations',
+      path: 'assets/translations', 
       fallbackLocale: const Locale('en'),
       child: MultiProvider(
         providers: [

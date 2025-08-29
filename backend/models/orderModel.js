@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../connection");
+const User = require("./userModel");
 
 const Order = sequelize.define(
     "Order",
@@ -29,6 +30,11 @@ const Order = sequelize.define(
             defaultValue: "pending",
             field:"paymentstatus"
         },
+        sellerId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: 'users', key: 'id' },
+        },
         createdAt: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
@@ -45,5 +51,7 @@ const Order = sequelize.define(
         timestamps: false,
     }
 );
+Order.belongsTo(User, { as: 'buyer', foreignKey: 'userId' });
+Order.belongsTo(User, { as: 'seller', foreignKey: 'sellerId' });
 
 module.exports = Order;

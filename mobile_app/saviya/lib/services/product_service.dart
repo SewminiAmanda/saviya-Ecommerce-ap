@@ -27,33 +27,29 @@ class ProductService {
   }
 
   // Get all products of a user
-  static Future<List<dynamic>> getUserProducts() async {
-    print("it hits here 1");
-
+  static Future<List<dynamic>> getUserProducts({int? userId}) async {
     try {
       final token = await AuthService.getToken();
+      final url = userId != null
+          ? "$baseUrl/user/$userId"
+          : "$baseUrl/user"; // adjust according to backend
       final response = await http.get(
-        Uri.parse("$baseUrl/user"),
+        Uri.parse(url),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
         },
       );
-
-      print("product, ${response.body}");
-      print("$token");
-
+      print("my products: ${response.body}");
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['success'] == true && data['products'] != null) {
-          print(data['products']);
-          return data['products'];
-        }
+        final data = jsonDecode(response.body);
+
+        return data['products'];
+      } else {
+        throw Exception("Failed to load products: ${response.body}");
       }
-      return [];
     } catch (e) {
-      print('Error in ProductService.getUserProducts: $e');
-      return [];
+      throw Exception("Error fetching products: $e");
     }
   }
 

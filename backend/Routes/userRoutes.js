@@ -1,6 +1,6 @@
 const express = require('express');
 const UserController = require('../controllers/userController');  // Import user controller
-const authenticate = require('../middlewears/auth');  
+const authenticate = require('../middlewears/auth');
 const EmailController = require('../controllers/emailController');
 const router = express.Router();
 
@@ -19,6 +19,7 @@ router.put('/verify/:id', authenticate, UserController.verifyUser);
 router.put('/reject/:id', UserController.rejectUser);
 router.post('/emails/reject', EmailController.sendRejectionEmail);
 router.put('/update-verification-doc/:id', UserController.updateVerificationDocs);
+router.put('/change-address', authenticate,  UserController.updateShippingAddress);
 
 // Should always be last
 router.get('/:id', UserController.getUserById);

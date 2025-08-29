@@ -24,6 +24,8 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    const mainColor = Color(0xFFF39C12);
+
     return Scaffold(
       body: Column(
         children: [
@@ -36,48 +38,95 @@ class _CartPageState extends State<CartPage> {
                 }
 
                 if (cartService.cartItems.isEmpty) {
-                  return Center(child: Text("cart_empty".tr()));
+                  return Center(
+                    child: Text(
+                      "cart_empty".tr(),
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  );
                 }
 
                 return ListView.builder(
+                  padding: const EdgeInsets.all(12),
                   itemCount: cartService.cartItems.length,
                   itemBuilder: (context, index) {
                     final item = cartService.cartItems[index];
                     return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                      elevation: 3,
+                      shadowColor: mainColor.withOpacity(0.3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: ListTile(
-                        title: Text(item.name), // variable, don't translate
-                        subtitle: Text(
-                          '${'qty_price'.tr()}: ${item.quantity} | Rs. ${item.price.toStringAsFixed(2)}',
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 12,
                         ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        child: Row(
                           children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove),
-                              onPressed: () {
-                                if (item.quantity > 1) {
-                                  cartService.updateCartItem(
-                                    item.id,
-                                    item.quantity - 1,
-                                  );
-                                }
-                              },
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    "Rs. ${item.price.toStringAsFixed(2)} / unit",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: () {
-                                cartService.updateCartItem(
-                                  item.id,
-                                  item.quantity + 1,
-                                );
-                              },
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: mainColor.withOpacity(0.1),
+                              ),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    color: mainColor,
+                                    onPressed: () {
+                                      if (item.quantity > 1) {
+                                        cartService.updateCartItem(
+                                          item.id,
+                                          item.quantity - 1,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  Text(
+                                    item.quantity.toString(),
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    color: mainColor,
+                                    onPressed: () {
+                                      cartService.updateCartItem(
+                                        item.id,
+                                        item.quantity + 1,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
+                            const SizedBox(width: 8),
                             IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
+                              icon: const Icon(Icons.delete),
+                              color: Colors.redAccent,
                               onPressed: () {
                                 cartService.removeFromCart(item.id);
                               },
@@ -91,11 +140,10 @@ class _CartPageState extends State<CartPage> {
               },
             ),
           ),
-          // Checkout section
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: mainColor.withOpacity(0.1),
               border: const Border(top: BorderSide(color: Colors.black12)),
             ),
             child: Consumer2<CartService, OrderService>(
@@ -107,13 +155,24 @@ class _CartPageState extends State<CartPage> {
                       args: [cartService.total.toStringAsFixed(2)],
                     ),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.right,
                   ),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
+                  const SizedBox(height: 5),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.white, // fill white
+                      side: const BorderSide(
+                        color: mainColor,
+                        width: 2,
+                      ), // orange border
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     onPressed: orderService.isPlacing
                         ? null
                         : () async {
@@ -128,8 +187,7 @@ class _CartPageState extends State<CartPage> {
                               cartService.cartItems,
                             );
 
-                            if (!mounted)
-                              return; // ✅ prevent async context issues
+                            if (!mounted) return;
 
                             if (orderData != null) {
                               cartService.clearCart();
@@ -150,12 +208,20 @@ class _CartPageState extends State<CartPage> {
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                              color: Colors.white,
+                              color: mainColor, // progress color orange
                               strokeWidth: 2,
                             ),
                           )
-                        : Text("place_order".tr()),
+                        : Text(
+                            "place_order".tr(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: mainColor, // text color orange
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
+
                 ],
               ),
             ),

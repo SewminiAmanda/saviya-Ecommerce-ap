@@ -1,26 +1,46 @@
-// controllers/orderController.js
 
+const sequelize = require("../connection");
 const Order = require('../models/orderModel');
 const Cart = require('../models/cartModel');
 const CartItem = require('../models/cartItemModel');
 const OrderItem = require("../models/orderItemModel");
 const Product = require('../models/productModel');
+const User = require("../models/userModel");
 
 // Create order from cart
 exports.createOrder = async (req, res) => {
     try {
-        const userId = req.user.userid; // Make sure your auth middleware sets req.user.userid
+        const userId = req.user.userid;
         console.log("user id in order: ", userId);
 
-        // Fetch cart with items
+        // Fetch cart with items and their products
         const cart = await Cart.findOne({
             where: { userId },
-            include: [{ model: CartItem, as: 'items' }]
+            include: [
+                {
+                    model: CartItem,
+                    as: 'items',
+                    include: [
+                        {
+                            model: Product,
+                            as: 'product',
+                            attributes: ['productId', 'userId', 'productName', 'price'],
+                        }
+                    ]
+                }
+            ]
         });
 
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: "Cart is empty" });
         }
+
+        // Ensure all products have the same seller
+        const sellerIds = new Set(cart.items.map(item => item.product.userId));
+        if (sellerIds.size > 1) {
+            return res.status(400).json({ message: "All products must belong to the same seller" });
+        }
+        const sellerId = cart.items[0].product.userId;
 
         // Calculate total
         const totalAmount = cart.items.reduce(
@@ -32,6 +52,7 @@ exports.createOrder = async (req, res) => {
         const order = await Order.create({
             userId,
             totalAmount,
+            sellerId,
             status: "pending",
             paymentStatus: "pending",
         });
@@ -44,23 +65,34 @@ exports.createOrder = async (req, res) => {
             price: item.price,
         }));
 
+
         await OrderItem.bulkCreate(orderItems);
 
         // Clear cart
         await CartItem.destroy({ where: { cartId: cart.cartid } });
 
-        // Fetch created order with OrderItems + Product
+        // Fetch created order with OrderItems + Product + buyer/seller
         const createdOrder = await Order.findOne({
             where: { orderId: order.orderId },
             include: [
+                {
+                    model: User,
+                    as: 'buyer',
+                    attributes: ['userid','first_name', 'last_name', 'address', 'email'], // fixed column names
+                },
+                {
+                    model: User,
+                    as: 'seller',
+                    attributes: ['userid', 'first_name', 'last_name', 'address', 'email'], // fixed column names
+                },
                 {
                     model: OrderItem,
                     as: 'OrderItems',
                     include: [
                         {
                             model: Product,
-                            as: 'product', // must match association alias
-                            attributes: ['productName'], // only get productName
+                            as: 'product',
+                            attributes: ['productName'],
                         },
                     ],
                 },
@@ -68,8 +100,6 @@ exports.createOrder = async (req, res) => {
         });
 
         const orderJson = createdOrder.toJSON();
-
-        // Map OrderItems to Flutter-friendly items including product name
         orderJson.items = orderJson.OrderItems.map(oi => ({
             id: oi.orderItemId,
             productId: oi.productId,
@@ -78,7 +108,8 @@ exports.createOrder = async (req, res) => {
             name: oi.product?.productName ?? `Product #${oi.productId}`,
         }));
 
-        console.log(orderJson);
+        console.log("created order", orderJson);
+
         res.status(201).json({ message: "Order placed successfully", order: orderJson });
 
     } catch (error) {

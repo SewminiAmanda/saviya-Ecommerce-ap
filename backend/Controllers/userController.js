@@ -272,7 +272,49 @@ const UserController = {
     } catch (err) {
       res.status(500).json({ success: false, message: 'Error fetching user', error: err.message });
     }
+  },
+  // Add/update shipping address
+  updateShippingAddress: async (req, res) => {
+    try {
+      console.log("Incoming request body:", req.body);
+      const userId = req.user.userid;
+      console.log("user id in address: ", userId);
+
+      const { address } = req.body;
+      if (!address) {
+        console.log("No address provided!");
+        return res.status(400).json({
+          success: false,
+          message: 'Shipping address is required'
+        });
+      }
+
+      const user = await User.findById(userId);
+      if (!user) {
+        console.log("User not found for ID:", userId);
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      // Update the shipping address
+      user.address = address;
+      await user.save();
+      console.log("Updated address:", user.address);
+
+      res.status(200).json({
+        success: true,
+        message: 'Shipping address updated successfully',
+        address: user.address
+      });
+    } catch (err) {
+      console.error("Failed to update shipping address:", err);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update shipping address',
+        error: err.message
+      });
+    }
   }
+
   
 
 };
