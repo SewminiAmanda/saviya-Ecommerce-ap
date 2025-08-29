@@ -7,7 +7,7 @@ import 'components/header.dart';
 import '../order/invoice.dart';
 
 class CartPage extends StatefulWidget {
-  const CartPage({Key? key}) : super(key: key);
+  const CartPage({super.key});
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -49,14 +49,9 @@ class _CartPageState extends State<CartPage> {
                         vertical: 6,
                       ),
                       child: ListTile(
-                        title: Text(item.name),
+                        title: Text(item.name), // variable, don't translate
                         subtitle: Text(
-                          "qty_price".tr(
-                            args: [
-                              item.quantity.toString(),
-                              item.price.toStringAsFixed(2),
-                            ],
-                          ),
+                          '${'qty_price'.tr()}: ${item.quantity} | Rs. ${item.price.toStringAsFixed(2)}',
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -132,6 +127,9 @@ class _CartPageState extends State<CartPage> {
                             final orderData = await orderService.placeOrder(
                               cartService.cartItems,
                             );
+
+                            if (!mounted)
+                              return; // ✅ prevent async context issues
 
                             if (orderData != null) {
                               cartService.clearCart();

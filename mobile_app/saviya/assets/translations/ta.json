@@ -61,5 +61,9 @@
     "recent_added_products": "சமீபத்தில் சேர்க்கப்பட்ட பொருட்கள்",
     "price": "விலை",
     "seller": "விற்பனையாளர்",
-    "Available Stock": "கிடைக்கும் பங்கு"
+    "Available Stock": "கிடைக்கும் பங்கு",
+    "products": "தயாரிப்புகள்",
+    "sellers": "விற்பனையாளர்கள்",
+    "refresh": "புதுப்பிக்கவும்",
+    "qty_price": "அளவு: "
 }

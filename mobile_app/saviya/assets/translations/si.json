@@ -39,8 +39,8 @@
     "fill_all_fields": "සියලුම අත්‍යවශ්‍ය ක්ෂේත්‍ර පුරවා හෝ",
     "failed_load_image": "පින්තූරය උඩුගත කිරීමට අසමත් විය",
     "cart_empty": "ඔබගේ වෙළඳ මැසුම් හිස්ව ඇත",
-    "qty_price": "ප්‍රමාණය: {0} • රු.{1}",
-    "total_price": "මුළු මුදල: රු.{0}",
+    "qty_price": "ප්‍රමාණය:",
+    "total_price": "මුළු මුදල:",
     "place_order": "ඔඩරය තැබීම",
     "order_failed": "ඔඩරය තැබීම අසාර්ථක විය",
     "add_to_cart": "කරත්තයට එකතු කරන්න",
@@ -79,6 +79,9 @@
     "recent_added_products": "මෑතකදී එකතු කළ භාණ්ඩ",
     "price": "මිල",
     "seller": "විකුණුම්කරු",
-    "Available Stock": "ලබා ගත හැකි තොගය"
+    "Available Stock": "ලබා ගත හැකි තොගය",
+    "products": "නිෂ්පාදන",
+    "sellers": "විකුණුම්කරුවන්",
+    "refresh": "නවීකරණය"
     
 }

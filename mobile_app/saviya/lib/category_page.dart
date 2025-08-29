@@ -180,7 +180,7 @@ class _CategoryPageState extends State<CategoryPage> {
                       Row(
                         children: [
                           _buildTab("products".tr(), true),
-                          const SizedBox(width: 150),
+                          const SizedBox(width: 80),
                           _buildTab("sellers".tr(), false),
                         ],
                       ),
