@@ -65,5 +65,20 @@
     "products": "தயாரிப்புகள்",
     "sellers": "விற்பனையாளர்கள்",
     "refresh": "புதுப்பிக்கவும்",
-    "qty_price": "அளவு: "
+    "qty_price": "அளவு: ",
+    "Profile": "சுயவிவரம்",
+    "Buyer Orders": "வாங்கிய ஆர்டர்கள்",
+    "Seller Orders": "விற்கும் ஆர்டர்கள்",
+    "No Products Found": "தயாரிப்புகள் இல்லை",
+    "No Buyer Orders": "வாங்கிய ஆர்டர்கள் இல்லை",
+    "No Seller Orders": "விற்கும் ஆர்டர்கள் இல்லை",
+    "change_address": "முகவரி மாற்றவும்",
+    "shipping_address": "பொரிய முகவரி",
+    "shipping_address_required": "பொரிய முகவரி அவசியம்",
+    "address_updated_success": "முகவரி வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
+    "address_update_failed": "முகவரி புதுப்பிக்க முடியவில்லை",
+    "cancel": "ரத்து செய்",
+    "update": "புதுப்பிக்கவும்",
+    "User ID not found": "பயனர் ஐடி காணவில்லை",
+    "Verification Rejected": "சரிபார்த்தல் நிராகரிக்கப்பட்டது"
 }
