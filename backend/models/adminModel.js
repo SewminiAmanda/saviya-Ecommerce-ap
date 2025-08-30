@@ -10,7 +10,7 @@ const Admin = sequelize.define('Admin', {
     },
     user_name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true, // Changed to allow null for invited admins
     },
     email: {
         type: DataTypes.STRING,
@@ -30,14 +30,22 @@ const Admin = sequelize.define('Admin', {
     },
     profile_picture: {
         type: DataTypes.STRING,
+        allowNull: true,
     },
+    isFirstLogin: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        field: 'is_first_login'
+    }
 }, {
     tableName: 'admin',
     timestamps: false,
     hooks: {
         beforeCreate: async (user) => {
-            const saltRounds = 10;
-            user.password = await bcrypt.hash(user.password, saltRounds);
+            if (user.password) {
+                const saltRounds = 10;
+                user.password = await bcrypt.hash(user.password, saltRounds);
+            }
         },
     }
 });

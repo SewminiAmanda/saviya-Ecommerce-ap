@@ -1,0 +1,33 @@
+{
+    "product_name": "නිෂ්පාදන නාමය",
+    "stock": "ලබාගත හැකි තොගය",
+    "categories": "වර්ග",
+    "to_pay": "ගෙවිය යුතුය",
+    "to_ship": "ඇණවුම් යැවිය යුතුය",
+    "shipped": "යැවූවා",
+    "to_review": "සමාලෝචනය කරන්න",
+    "return": "ආපසු යැවීම",
+    "unnamed": "නමින් නොමැත",
+    "no_description": "විස්තරයක් නොමැත",
+    "address": "ලිපිනය",
+    "home": "මුල් පිටුව",
+    "search": "සෙවීම",
+    "cart": "කරත්තය",
+    "profile": "පැතිකඩ",
+    "language": "භාෂාව",
+    "add_to_cart": "කරත්තයට එකතු කරන්න",
+    "added_to_cart": "කරත්තයට එකතු කරන ලදී",
+    "failed_to_add_to_cart": "කරත්තයට එකතු කිරීම අසාර්ථක විය",
+    "invalid_quantity": "වැරදි ප්‍රමාණය",
+    "select_quantity": "ප්‍රමාණය තෝරන්න",
+    "enter_quantity_min": "ප්‍රමාණය ඇතුළත් කරන්න (අවම {{minQty}})",
+    "product_description": "නිෂ්පාදන විස්තරය",
+    "price_label": "මිල: රු. {{price}}",
+    "seller_label": "විකුණන්නා: {{seller}}",
+    "available_stock_label": "ලබා ගත හැකි ප්‍රමාණය: {{stock}}",
+    "products_count": {
+        "zero": "භාණ්ඩ නොමැත",
+        "one": "භාණ්ඩය 1",
+        "other": "{{count}} භාණ්ඩ"
+    }
+}

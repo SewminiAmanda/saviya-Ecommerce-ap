@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import Pagination from '@mui/material/Pagination';
 import PaginationItem from '@mui/material/PaginationItem';
+import { logActivity } from "../../components/ActivityLogger";
 
 const Requests = () => {
   const [users, setUsers] = useState([]);
@@ -51,6 +52,14 @@ const Requests = () => {
             },
           }
         );
+
+        //  Log activity
+        await logActivity(
+          user.userid,
+          "USER_VERIFIED",
+          `Admin verified user ${user.first_name} ${user.last_name}`
+        );
+
         updatedUsers.splice(index, 1);
         setUsers(updatedUsers);
         alert(`${user.first_name} ${user.last_name} has been verified.`);
@@ -83,6 +92,14 @@ const Requests = () => {
         reason: rejectionReason,
         id: user.userid
       });
+      
+      //  Log activity
+      await logActivity(
+        user.userid,
+        "USER_REJECTED",
+        `Admin rejected user ${user.first_name} ${user.last_name}`,
+        { reason: rejectionReason }
+      );
 
       // 3. Remove user from current list
       updatedUsers.splice(selectedUserIndex, 1);

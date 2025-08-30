@@ -27,6 +27,11 @@ const Product = sequelize.define('Product', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  min_quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 10, 
+  },
   description: {
     type: DataTypes.TEXT,
     allowNull: true,
@@ -37,7 +42,7 @@ const Product = sequelize.define('Product', {
   }
 }, {
   tableName: 'product',
-  timestamps: true, // createdAt and updatedAt will be managed automatically
+  timestamps: true, 
 });
 
 module.exports = Product;

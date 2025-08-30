@@ -7,24 +7,15 @@ const Cart = sequelize.define('Cart', {
         autoIncrement: true,
         primaryKey: true,
     },
-    userid: {
+    userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    productid: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
-    quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 1,
-    },
-    created_at: {
+    createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
-    updated_at: {
+    updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     }
@@ -32,10 +23,5 @@ const Cart = sequelize.define('Cart', {
     tableName: 'cart',
     timestamps: false,
 });
-
-// Optional: Helper method to get all cart items for a user
-Cart.getUserCart = async function (userid) {
-    return await this.findAll({ where: { userid } });
-};
 
 module.exports = Cart;

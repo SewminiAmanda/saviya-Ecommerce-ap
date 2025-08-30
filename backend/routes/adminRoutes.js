@@ -4,10 +4,11 @@ const authenticate = require('../middlewears/auth');
 const router = express.Router();
 
 // Admin routes
-router.post('/register', AdminController.signup);  
 router.post('/login', AdminController.login);   
 router.get('/adminuser', authenticate, AdminController.getCurrentAdmin);     
 router.put('/admin/update/:id', authenticate, AdminController.updateAdmin);
 router.delete('/admin/delete/:id', authenticate, AdminController.deleteAdmin);
+router.post('/invite', authenticate, AdminController.inviteAdmin);
+router.put('/change-password', authenticate, AdminController.updatePassword);
 
 module.exports = router;

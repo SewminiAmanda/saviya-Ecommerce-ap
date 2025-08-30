@@ -15,13 +15,11 @@ const LoginPage = () => {
     }
   }, [navigate]);
 
-  // Inline login function
   const login = async (email, password) => {
     const response = await fetch(`${API_URL}/api/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-      
+      body: JSON.stringify({ email, password: password.trim() }),
     });
 
     if (!response.ok) {
@@ -29,7 +27,6 @@ const LoginPage = () => {
     }
 
     const data = await response.json();
-    localStorage.setItem('adminToken', data.token);
     return data;
   };
 
@@ -43,9 +40,19 @@ const LoginPage = () => {
     }
 
     try {
-      await login(email, password);
-      navigate('/dashboard');
+      const data = await login(email, password);
+
+      // Save token
+      localStorage.setItem('adminToken', data.token);
+
+      // Redirect based on first login
+      if (data.admin.isFirstLogin) {
+        navigate('/change-password', { state: { userId: data.admin.id } });
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
+      console.error("Login error:", err);
       setError('Invalid credentials');
     }
   };

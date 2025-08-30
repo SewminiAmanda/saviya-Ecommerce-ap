@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const http = require('http'); // Needed to create server for Socket.IO
+const http = require('http');
 const socketIo = require('socket.io');
 const sequelize = require('./connection');
 const userRoutes = require('./routes/userRoutes');
@@ -9,6 +9,9 @@ const categoryRoutes = require('./routes/categoryRoutes.js');
 const productRoutes = require('./routes/productRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js');
 const chatRoutes = require('./routes/chatRoutes');
+const cartRoutes = require('./routes/cartRoutes.js')
+const activityRoutes = require("./routes/activityRoutes");
+const orderRoutes = require('./routes/orderRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -46,6 +49,9 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/cart', cartRoutes)
+app.use("/api/activities", activityRoutes);
+app.use("/api/orders",orderRoutes)
 
 
 // Start server

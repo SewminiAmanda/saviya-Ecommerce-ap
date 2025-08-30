@@ -49,6 +49,9 @@ const User = sequelize.define('User', {
     profile_picture: {
         type: DataTypes.STRING,
     },
+    address: {
+        type: DataTypes.TEXT,
+    },
     verification_docs: {
         type: DataTypes.STRING,
         allowNull: true

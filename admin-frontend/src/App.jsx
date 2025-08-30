@@ -12,6 +12,8 @@ import Register from "./pages/pages/register.jsx";
 import Profile from "./pages/pages/profile.jsx";
 import DashboardHome from "./pages/pages/dashboardHome.jsx";
 import EditAdmin from "./pages/pages/editAdmin.jsx";
+import ChangePasswordPage from './pages/ChangePassword.jsx';
+import ChangeProfile from './pages/ChangeProfile.jsx';
 
 const App = () => {
   return (
@@ -19,6 +21,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/profile-change" element={<ChangeProfile />} />
 
         {/* Protect all /dashboard routes */}
         <Route
@@ -37,6 +41,7 @@ const App = () => {
           <Route path="register" element={<Register />} />
           <Route path="profile" element={<Profile />} />
           <Route path="editAdmin" element={<EditAdmin />} />
+          
         </Route>
       </Routes>
     </Router>

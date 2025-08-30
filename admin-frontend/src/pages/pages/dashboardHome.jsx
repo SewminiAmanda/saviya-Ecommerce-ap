@@ -9,6 +9,8 @@ const DashboardHome = () => {
         { label: "Rejected Users", value: 0, bg: "bg-red-500" },
     ]);
 
+    const [activities, setActivities] = useState([]);
+
     useEffect(() => {
         const fetchStats = async () => {
             try {
@@ -26,7 +28,18 @@ const DashboardHome = () => {
             }
         };
 
+        const fetchActivities = async () => {
+            try {
+                // For admin dashboard, fetch all activities
+                const response = await axios.get("http://localhost:8080/api/activities/");
+                setActivities(response.data);
+            } catch (error) {
+                console.error("Failed to fetch activities:", error);
+            }
+        };
+
         fetchStats();
+        fetchActivities();
     }, []);
 
     return (
@@ -46,11 +59,36 @@ const DashboardHome = () => {
                 ))}
             </div>
 
-            {/* Placeholder for charts or recent activity */}
+            {/* Recent activity */}
             <div className="mt-10">
                 <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
                 <div className="bg-white rounded-xl shadow p-4 text-gray-600">
-                    <p>No recent activity yet.</p>
+                    {activities.length === 0 ? (
+                        <p>No recent activity yet.</p>
+                    ) : (
+                        <ul className="divide-y divide-gray-200">
+                            {activities.map((act) => (
+                                <li key={act.id} className="py-2">
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <p className="font-medium">{act.activityType}</p>
+                                            <p className="text-sm text-gray-500">
+                                                {act.activityDescription}
+                                            </p>
+                                            {act.metadata && act.metadata.reason && (
+                                                <p className="text-sm text-gray-400">
+                                                    Reason: {act.metadata.reason}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <span className="text-xs text-gray-400">
+                                            {new Date(act.createdAt).toLocaleString()}
+                                        </span>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
             </div>
         </div>
