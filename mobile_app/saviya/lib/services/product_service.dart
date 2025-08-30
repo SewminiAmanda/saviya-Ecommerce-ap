@@ -1,16 +1,56 @@
-import 'package:http/http.dart' as http;
+import 'dart:io';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth_service.dart';
+
+final supabase = Supabase.instance.client;
 
 class ProductService {
   static const String baseUrl = 'http://10.0.2.2:8080/api/product';
 
-  // Create product
+  /// Upload image to Supabase and get public URL
+static Future<String> uploadImage(File file) async {
+    try {
+      final fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}';
+      print('[DEBUG] Uploading file: ${file.path}');
+      print('[DEBUG] Generated file name: $fileName');
+
+      final res = await supabase.storage
+          .from('products')
+          .upload(fileName, file);
+      print('[DEBUG] Supabase upload response: $res');
+
+      if (res.isEmpty) {
+        print('[ERROR] Upload response is empty!');
+        throw Exception('Upload failed');
+      }
+
+      final publicUrl = supabase.storage
+          .from('products')
+          .getPublicUrl(fileName);
+      print('[DEBUG] Public URL: $publicUrl');
+
+      return publicUrl;
+    } catch (e, stackTrace) {
+      print('[ERROR] Failed to upload image: $e');
+      print(stackTrace);
+      rethrow;
+    }
+  }
+
+
+  /// Add a product to backend
   static Future<bool> addProduct(Map<String, dynamic> productData) async {
     try {
+      final token = await AuthService.getToken();
       final response = await http.post(
         Uri.parse('$baseUrl/create'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode(productData),
       );
 
@@ -25,7 +65,6 @@ class ProductService {
       return false;
     }
   }
-
   // Get all products of a user
   static Future<List<dynamic>> getUserProducts({int? userId}) async {
     try {

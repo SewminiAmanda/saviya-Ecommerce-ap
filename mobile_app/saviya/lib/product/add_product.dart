@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../services/auth_service.dart';
 
 final supabase = Supabase.instance.client;
 
@@ -26,6 +27,7 @@ class _AddProductPageState extends State<AddProductPage> {
   TextEditingController descController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
+  TextEditingController minQuantityController = TextEditingController();
 
   List categories = [];
   String? selectedCategory;
@@ -71,11 +73,15 @@ class _AddProductPageState extends State<AddProductPage> {
     }
 
     final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'heic'],
     );
 
-    if (result == null || result.files.single.path == null) return;
+
+    if (result == null || result.files.single.path == null) {
+      debugPrint("❌ No file selected.");
+      return;
+    }
 
     setState(() {
       isUploading = true;
@@ -83,13 +89,22 @@ class _AddProductPageState extends State<AddProductPage> {
     });
 
     try {
-      final file = await compute(loadFile, result.files.single.path!);
+      final filePath = result.files.single.path!;
+      final file = File(filePath);
+
       final fileName =
           '${DateTime.now().millisecondsSinceEpoch}_${result.files.single.name}';
+
+      debugPrint("📂 Preparing to upload file: $filePath");
+      debugPrint("📝 Generated file name: $fileName");
 
       final uploadedPath = await supabase.storage
           .from('products')
           .upload(fileName, file);
+
+      debugPrint("✅ Upload response path: $uploadedPath");
+
+      debugPrint("✅ Upload response path: $uploadedPath");
 
       if (uploadedPath.isEmpty) throw Exception('Upload failed');
 
@@ -97,13 +112,17 @@ class _AddProductPageState extends State<AddProductPage> {
           .from('products')
           .getPublicUrl(fileName);
 
+      debugPrint("🌍 Public URL generated: $publicUrl");
+
       if (mounted) {
         setState(() {
           imageUrl = publicUrl;
           isUploading = false;
         });
       }
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint("❌ Upload error: $e");
+      debugPrint("📌 StackTrace: $st");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('file_upload_failed'.tr(args: [e.toString()]))),
       );
@@ -131,17 +150,27 @@ class _AddProductPageState extends State<AddProductPage> {
       'productName': nameController.text,
       'description': descController.text,
       'categoryName': selectedCategory,
-      'price': double.parse(priceController.text),
-      'quantity': int.parse(quantityController.text),
+      'price': double.tryParse(priceController.text) ?? 0,
+      'quantity': int.tryParse(quantityController.text) ?? 0,
+      'minQuantity': int.tryParse(minQuantityController.text) ?? 1,
       'image': imageUrl ?? '',
     };
 
+    debugPrint("📦 Sending product data: ${jsonEncode(productData)}");
+
     try {
+      final token = await AuthService.getToken();
       final response = await http.post(
         Uri.parse('http://10.0.2.2:8080/api/product/create'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode(productData),
       );
+
+      debugPrint("📥 Response status: ${response.statusCode}");
+      debugPrint("📥 Response body: ${response.body}");
 
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(
@@ -153,7 +182,9 @@ class _AddProductPageState extends State<AddProductPage> {
           context,
         ).showSnackBar(SnackBar(content: Text('failed_add_product'.tr())));
       }
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint("❌ Submit error: $e");
+      debugPrint("📌 StackTrace: $st");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('error_submitting_product'.tr())));
@@ -237,6 +268,13 @@ class _AddProductPageState extends State<AddProductPage> {
                 keyboardType: TextInputType.number,
                 validator: (value) =>
                     value!.isEmpty ? 'enter_price'.tr() : null,
+              ),
+              TextFormField(
+                controller: minQuantityController,
+                decoration: InputDecoration(labelText: 'Minimum Quantity'),
+                keyboardType: TextInputType.number,
+                validator: (value) =>
+                    value!.isEmpty ? 'Enter minimum quantity' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
