@@ -12,6 +12,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const cartRoutes = require('./routes/cartRoutes.js')
 const activityRoutes = require("./routes/activityRoutes");
 const orderRoutes = require('./routes/orderRoutes');
+const reviewRoutes = require("./Routes/reviewRoute.js");
 require('dotenv').config();
 
 const app = express();
@@ -51,7 +52,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/cart', cartRoutes)
 app.use("/api/activities", activityRoutes);
-app.use("/api/orders",orderRoutes)
+app.use("/api/orders", orderRoutes)
+app.use("/api/reviews", reviewRoutes);
 
 
 // Start server

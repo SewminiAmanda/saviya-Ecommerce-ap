@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../services/order_service.dart';
 import '../services/auth_service.dart';
+import '../services/product_service.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -81,6 +82,84 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
+  /// 🔹 Review Dialog
+  Future<void> _showReviewDialog(int productId) async {
+    final TextEditingController _commentController = TextEditingController();
+    double rating = 3.0;
+    final parentContext = context; // save parent context
+
+    showDialog(
+      context: parentContext,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Add Review"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return IconButton(
+                        icon: Icon(
+                          index < rating ? Icons.star : Icons.star_border,
+                          color: Colors.orange,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            rating = index + 1.0;
+                          });
+                        },
+                      );
+                    }),
+                  ),
+                  TextField(
+                    controller: _commentController,
+                    decoration: const InputDecoration(
+                      hintText: "Write a comment...",
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: const Text("Cancel"),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                  ),
+                  child: const Text("Submit"),
+                  onPressed: () async {
+                    Navigator.pop(context); // close dialog first
+                    try {
+                      await ProductService.addReview(
+                        productId: productId,
+                        rating: rating.toInt(),
+                        comment: _commentController.text,
+                      );
+
+                      // Use the parent context here
+                      ScaffoldMessenger.of(parentContext).showSnackBar(
+                        const SnackBar(content: Text("Review submitted!")),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(parentContext).showSnackBar(
+                        SnackBar(content: Text("Failed to submit review: $e")),
+                      );
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isSeller =
@@ -115,7 +194,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     "Seller".tr(),
                     "${order['seller']['first_name']} ${order['seller']['last_name']}",
                   ),
-                  // Status row
                   isSeller
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -170,6 +248,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 ),
                 subtitle: Text(
                   "Qty: ${item['quantity']} | Price: \$${item['price']}",
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.rate_review, color: Colors.orange),
+                  onPressed: () {
+                    _showReviewDialog(item['productId']);
+                  },
                 ),
               ),
             ),
