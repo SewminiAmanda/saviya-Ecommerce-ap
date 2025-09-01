@@ -1,8 +1,13 @@
-// models/message.js
+// models/messageModel.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../connection'); // your sequelize instance
 
 const Message = sequelize.define('Message', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
     sender_id: {
         type: DataTypes.INTEGER,
         allowNull: false,

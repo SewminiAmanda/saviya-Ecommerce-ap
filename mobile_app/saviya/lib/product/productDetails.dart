@@ -4,6 +4,8 @@ import '../components/header.dart';
 import '../services/cart_service.dart';
 import '../services/product_service.dart';
 import '../model/review_model.dart';
+import '../chat/chat_page.dart';
+import '../services/auth_service.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final String productName;
@@ -17,7 +19,7 @@ class ProductDetailsPage extends StatefulWidget {
   final int productId;
 
   const ProductDetailsPage({
-    Key? key,
+    super.key,
     required this.productName,
     required this.price,
     required this.quantity,
@@ -27,7 +29,7 @@ class ProductDetailsPage extends StatefulWidget {
     required this.description,
     required this.sellerId,
     required this.productId,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductDetailsPage> createState() => _ProductDetailsPageState();
@@ -37,11 +39,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   late Future<List<Review>> _reviewsFuture;
   final TextEditingController _reviewController = TextEditingController();
   int _rating = 0;
+  int? _currentUserId;
 
   @override
   void initState() {
     super.initState();
     _reviewsFuture = ProductService().getReviews(widget.productId);
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final id = await AuthService.getUserId();
+    if (!mounted) return;
+    setState(() {
+      _currentUserId = id;
+    });
   }
 
   @override
@@ -50,9 +62,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     super.dispose();
   }
 
-  void _submitReview() async {
+  Future<void> _submitReview() async {
     final comment = _reviewController.text.trim();
     if (_rating == 0 || comment.isEmpty) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please provide rating and comment')),
       );
@@ -66,6 +79,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         comment: comment,
       );
 
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Review submitted!')));
@@ -76,6 +90,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         _reviewsFuture = ProductService().getReviews(widget.productId);
       });
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to submit review: $e')));
@@ -257,6 +272,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               widget.productId,
                               selectedQty,
                             );
+                            if (!mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -273,6 +289,42 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Chat with Seller Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _currentUserId == null
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatPage(
+                                      userId: _currentUserId!,
+                                      friendId: widget.sellerId,
+                                      friendName:
+                                          widget.sellerName, // pass seller name
+                                      friendImage: '',
+                                    ),
+                                  ),
+                                );
+                              },
+                        icon: const Icon(Icons.chat),
+                        label: const Text(
+                          "Chat with Seller",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: Colors.blueAccent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

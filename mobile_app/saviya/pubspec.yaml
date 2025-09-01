@@ -39,7 +39,8 @@ dependencies:
   file_picker: ^10.3.2
   path: ^1.8.3
   permission_handler: ^11.0.0
-  flutter_chat_ui: ^2.6.1
+  flutter_chat_types: ^3.6.2
+  flutter_chat_ui: ^2.9.0
   socket_io_client: ^3.1.2
   flutter_inappwebview: ^6.0.0
   flutter_rating_bar: ^4.0.1
@@ -51,6 +52,7 @@ dependencies:
   talkjs_flutter: ^0.15.1
   webview_flutter: ^4.4.1
   flutter_dotenv: ^5.1.0
+  
 
 
 

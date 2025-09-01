@@ -1,6 +1,7 @@
 const Message = require('../models/messageModel');
 const { Op } = require('sequelize');
 
+// Get chat history between two users
 exports.getChatHistory = async (req, res) => {
     const { user1, user2 } = req.query;
     if (!user1 || !user2) {
@@ -17,15 +18,28 @@ exports.getChatHistory = async (req, res) => {
             },
             order: [['timestamp', 'ASC']],
         });
-        res.json({ success: true, messages });
-    } catch (error) {
-        console.error('Error fetching chat history:', error);
+
+        // Format for frontend
+        const formatted = messages.map(msg => ({
+            id: msg.id,
+            senderId: msg.sender_id,
+            receiverId: msg.receiver_id,
+            message: msg.message,
+            timestamp: msg.timestamp,
+        }));
+
+        res.json({ success: true, messages: formatted });
+    } catch (err) {
+        console.error(err);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
+
+// Save message directly via REST API if needed
 exports.saveMessage = async (req, res) => {
     const { sender_id, receiver_id, message } = req.body;
+
     if (!sender_id || !receiver_id || !message) {
         return res.status(400).json({ error: 'sender_id, receiver_id, and message are required' });
     }
