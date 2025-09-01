@@ -22,36 +22,37 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final SocketService socketService = SocketService();
-  List<Map<String, dynamic>> messages = [];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  List<Map<String, dynamic>> messages = [];
 
   @override
   void initState() {
     super.initState();
-    loadHistory();
-    connectSocket();
+    initChat();
   }
 
-  void loadHistory() async {
+  void initChat() async {
+    // 1️⃣ Load chat history from backend
     final history = await socketService.getChatHistory(
-      widget.userId.toString(),
-      widget.friendId.toString(),
+      widget.userId,
+      widget.friendId,
     );
-    setState(() {
-      messages = history;
-    });
-    _scrollToBottom();
-  }
 
-  void connectSocket() {
-    socketService.connect(widget.userId.toString(), widget.friendId.toString());
+    setState(() => messages = history);
+    _scrollToBottom();
+
+    // 2️⃣ Connect socket
+    socketService.connect(widget.userId, widget.friendId);
+
+    // 3️⃣ Listen for incoming messages
     socketService.onReceiveMessage((msg) {
-      // Avoid duplicate messages
-      if (msg['senderId'] != widget.userId) {
-        setState(() {
-          messages.add(msg);
-        });
+      // Only add messages relevant to this chat
+      if ((msg['senderId'] == widget.friendId &&
+              msg['receiverId'] == widget.userId) ||
+          (msg['senderId'] == widget.userId &&
+              msg['receiverId'] == widget.friendId)) {
+        setState(() => messages.add(msg));
         _scrollToBottom();
       }
     });
@@ -61,12 +62,10 @@ class _ChatPageState extends State<ChatPage> {
     if (_controller.text.trim().isEmpty) return;
     final msg = _controller.text.trim();
 
-    socketService.sendMessage(
-      widget.userId.toString(),
-      widget.friendId.toString(),
-      msg,
-    );
+    // Send via socket
+    socketService.sendMessage(widget.userId, widget.friendId, msg);
 
+    // Add locally
     setState(() {
       messages.add({
         'senderId': widget.userId,
@@ -93,7 +92,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildMessage(Map msg) {
-    bool isMe = msg['senderId'] == widget.userId;
+    bool isMe = msg['senderId'] == widget.userId; // ✅ Correct sender check
     DateTime time = DateTime.parse(msg['timestamp']);
     String formattedTime = DateFormat('hh:mm a').format(time);
 
@@ -105,6 +104,7 @@ class _ChatPageState extends State<ChatPage> {
             : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Avatar for friend's messages only
           if (!isMe && widget.friendImage.isNotEmpty)
             CircleAvatar(
               radius: 18,

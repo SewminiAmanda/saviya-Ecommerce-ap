@@ -204,7 +204,7 @@ const UserController = {
   },
   updateVerificationDocs: async (req, res) => {
     const { id } = req.params;
-    const { verification_docs } = req.body; // expected to be a string (e.g., URL)
+    const { verification_docs } = req.body; // URL of uploaded file
 
     try {
       const user = await User.findByPk(id);
@@ -221,7 +221,11 @@ const UserController = {
         verification_docs: user.verification_docs
       });
     } catch (err) {
-      res.status(500).json({ success: false, message: 'Failed to update verification document', error: err.message });
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update verification document',
+        error: err.message
+      });
     }
   },
 

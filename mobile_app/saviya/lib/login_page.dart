@@ -203,16 +203,6 @@ Widget _createAccountLink(BuildContext context) {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      const SizedBox(width: 80), // Adds space between the buttons
-      TextButton(
-        onPressed: () {
-          // Navigate to Forgot Password page
-        },
-        child: const Text(
-          "Forgot Password?",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
     ],
   );
 }

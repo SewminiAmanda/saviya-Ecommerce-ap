@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../home.dart';
 import '../profile_page.dart';
+import '../chat/chat_list.dart'; // <-- import your chat list page
 
 class CustomHeader extends StatelessWidget {
   const CustomHeader({super.key});
@@ -37,8 +38,10 @@ class CustomHeader extends StatelessWidget {
           // Right - Icons
           Row(
             children: [
-              IconButton(icon: const Icon(Icons.search), onPressed: () {},
-              tooltip: 'search'.tr(),
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {},
+                tooltip: 'search'.tr(),
               ),
 
               IconButton(
@@ -49,11 +52,24 @@ class CustomHeader extends StatelessWidget {
                 tooltip: 'cart'.tr(),
               ),
 
+              // New Chat Icon
+              IconButton(
+                icon: const Icon(Icons.message),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ChatListPage(),
+                    ),
+                  );
+                },
+                tooltip: 'messages'.tr(),
+              ),
+
               // Language switcher
               PopupMenuButton<String>(
                 icon: const Icon(Icons.translate),
                 onSelected: (String lang) {
-                  // Change the app locale
                   context.setLocale(Locale(lang));
                 },
                 itemBuilder: (_) => const [
@@ -61,7 +77,6 @@ class CustomHeader extends StatelessWidget {
                   PopupMenuItem(value: 'si', child: Text("සිංහල")),
                   PopupMenuItem(value: 'ta', child: Text("தமிழ்")),
                 ],
-                
               ),
 
               IconButton(

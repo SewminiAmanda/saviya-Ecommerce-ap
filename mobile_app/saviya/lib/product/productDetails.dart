@@ -6,6 +6,7 @@ import '../services/product_service.dart';
 import '../model/review_model.dart';
 import '../chat/chat_page.dart';
 import '../services/auth_service.dart';
+import '../services/socket_service.dart'; // corrected import
 
 class ProductDetailsPage extends StatefulWidget {
   final String productName;
@@ -310,9 +311,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                     builder: (context) => ChatPage(
                                       userId: _currentUserId!,
                                       friendId: widget.sellerId,
-                                      friendName:
-                                          widget.sellerName, // pass seller name
-                                      friendImage: '',
+                                      friendName: widget.sellerName,
                                     ),
                                   ),
                                 );
@@ -331,6 +330,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 30),
 
                     // Reviews Section
@@ -368,7 +368,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: reviews.length,
-                            separatorBuilder: (context, index) =>
+                            separatorBuilder: (_, __) =>
                                 const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final review = reviews[index];

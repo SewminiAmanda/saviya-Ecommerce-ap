@@ -26,7 +26,6 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  bool showProducts = true;
   List<dynamic> products = [];
   Map<int, String> sellerNames = {};
   bool isLoading = true;
@@ -177,23 +176,7 @@ class _CategoryPageState extends State<CategoryPage> {
                         ),
                       ),
                       const SizedBox(height: 30),
-                      Row(
-                        children: [
-                          _buildTab("products".tr(), true),
-                          const SizedBox(width: 80),
-                          _buildTab("sellers".tr(), false),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Expanded(
-                        child: showProducts
-                            ? _buildProductList()
-                            : Center(
-                                child: Text(
-                                  "sellers_list_not_implemented".tr(),
-                                ),
-                              ),
-                      ),
+                      Expanded(child: _buildProductList()),
                     ],
                   ),
                 ),
@@ -206,33 +189,6 @@ class _CategoryPageState extends State<CategoryPage> {
         onPressed: fetchProducts,
         tooltip: 'refresh'.tr(),
         child: const Icon(Icons.refresh),
-      ),
-    );
-  }
-
-  Widget _buildTab(String title, bool isProductTab) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          showProducts = isProductTab;
-        });
-      },
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: showProducts == isProductTab
-                  ? Colors.orange
-                  : Colors.black,
-            ),
-          ),
-          const SizedBox(height: 4),
-          if (showProducts == isProductTab)
-            Container(height: 3, width: 70, color: Colors.orange),
-        ],
       ),
     );
   }
