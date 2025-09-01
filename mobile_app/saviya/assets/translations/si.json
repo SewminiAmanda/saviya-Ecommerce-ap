@@ -29,5 +29,22 @@
         "zero": "භාණ්ඩ නොමැත",
         "one": "භාණ්ඩය 1",
         "other": "{{count}} භාණ්ඩ"
-    }
+    },
+    "Profile": "ප්‍රොෆයිල්",
+    "Products": "නිෂ්පාදන",
+    "Buyer Orders": "ගැණුම් ඇණවුම්",
+    "Seller Orders": "විකුණුම් ඇණවුම්",
+    "No Products Found": "නිෂ්පාදන නොමැත",
+    "No Buyer Orders": "ගැණුම් ඇණවුම් නොමැත",
+    "No Seller Orders": "විකුණුම් ඇණවුම් නොමැත",
+    "change_address": "ලිපිනය වෙනස් කරන්න",
+    "shipping_address": "රිසිපි ලිපිනය",
+    "shipping_address_required": "රිසිපි ලිපිනය අවශ්‍යයි",
+    "address_updated_success": "ලිපිනය සාර්ථකව යාවත්කාලීන විය",
+    "address_update_failed": "ලිපිනය යාවත්කාලීන කළ නොහැක",
+    "cancel": "අවලංගු කරන්න",
+    "update": "යාවත්කාලීන කරන්න",
+    "User ID not found": "පරිශීලක හැඳුනුම්පත සොයාගත නොහැක",
+    "Verification Rejected": "සත්‍යාපනය ප්‍රතික්ෂේප කරන ලදී",
+    "Change Address": "ලිපිනය වෙනස් කරන්න"
 }

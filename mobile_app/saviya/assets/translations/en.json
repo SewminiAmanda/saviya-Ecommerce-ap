@@ -72,5 +72,22 @@
   "user_id_not_found": "User ID not found.",
   "verification_rejected": "Your verification was rejected or blocked.",
   "recent_added_products": "Recent Added Products",
-  "refresh": "Refresh"
+  "refresh": "Refresh",
+  "Profile": "Profile",
+  "Products": "Products",
+  "Buyer Orders": "Buyer Orders",
+  "Seller Orders": "Seller Orders",
+  "No Products Found": "No Products Found",
+  "No Buyer Orders": "No Buyer Orders",
+  "No Seller Orders": "No Seller Orders",
+  "change_address": "Change Address",
+  "shipping_address": "Shipping Address",
+  "shipping_address_required": "Shipping address is required",
+  "address_updated_success": "Address updated successfully",
+  "address_update_failed": "Failed to update address",
+  "update": "Update",
+  "User ID not found": "User ID not found",
+  "Verification Rejected": "Verification Rejected",
+  "Change Address": "Change Address",
+  "Total": "Total"
 }

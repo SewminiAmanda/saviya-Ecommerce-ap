@@ -118,23 +118,27 @@ exports.createOrder = async (req, res) => {
     }
 };
 
-// Get all orders for user with product names
+// Orders where the logged-in user is the buyer
 exports.getUserOrders = async (req, res) => {
     try {
         const userId = req.user.userid;
         const orders = await Order.findAll({
-            where: { userId },
+            where: { userId }, // buyer
             include: [
+                {
+                    model: User,
+                    as: 'buyer',
+                    attributes: ['userid', 'first_name', 'last_name', 'address', 'email'],
+                },
+                {
+                    model: User,
+                    as: 'seller',
+                    attributes: ['userid', 'first_name', 'last_name', 'address', 'email'],
+                },
                 {
                     model: OrderItem,
                     as: 'OrderItems',
-                    include: [
-                        {
-                            model: Product,
-                            as: 'product',
-                            attributes: ['productName'],
-                        },
-                    ],
+                    include: [{ model: Product, as: 'product', attributes: ['productName'] }],
                 },
             ],
         });
@@ -153,9 +157,58 @@ exports.getUserOrders = async (req, res) => {
 
         res.json(ordersJson);
     } catch (error) {
-        res.status(500).json({ message: "Error fetching orders", error: error.message });
+        res.status(500).json({ message: "Error fetching buyer orders", error: error.message });
     }
 };
+
+// Orders where the logged-in user is the seller (received orders)
+exports.getSellerOrders = async (req, res) => {
+    try {
+        const sellerId = req.user.userid;
+
+        const orders = await Order.findAll({
+            where: { sellerId },
+            include: [
+                {
+                    model: User,
+                    as: 'buyer',
+                    attributes: ['userid', 'first_name', 'last_name', 'address', 'email'],
+                },
+                {
+                    model: User,
+                    as: 'seller',
+                    attributes: ['userid', 'first_name', 'last_name', 'address', 'email'],
+                },
+                {
+                    model: OrderItem,
+                    as: 'OrderItems',
+                    include: [
+                        { model: Product, as: 'product', attributes: ['productName'] }
+                    ],
+                },
+            ],
+        });
+
+        // Map to same structure as buyer orders
+        const ordersJson = orders.map(order => {
+            const obj = order.toJSON();
+            obj.items = obj.OrderItems.map(oi => ({
+                id: oi.orderItemId,
+                productId: oi.productId,
+                quantity: oi.quantity,
+                price: oi.price,
+                name: oi.product?.productName ?? `Product #${oi.productId}`,
+            }));
+            return obj;
+        });
+
+        res.json(ordersJson);
+    } catch (error) {
+        console.error("Error fetching seller orders", error);
+        res.status(500).json({ message: "Error fetching seller orders", error: error.message });
+    }
+};
+
 
 // Get single order details
 exports.getOrderById = async (req, res) => {
@@ -208,6 +261,38 @@ exports.updateOrderStatus = async (req, res) => {
 
         res.json({ message: "Order updated successfully", order });
     } catch (error) {
+        res.status(500).json({ message: "Error updating order", error: error.message });
+    }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { status, paymentStatus } = req.body;
+
+        console.log("Received update request:", { orderId, status, paymentStatus });
+
+        const order = await Order.findByPk(orderId);
+        if (!order) {
+            console.log("Order not found:", orderId);
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        if (status) {
+            console.log(`Updating status from ${order.status} to ${status}`);
+            order.status = status;
+        }
+        if (paymentStatus) {
+            console.log(`Updating paymentStatus from ${order.paymentStatus} to ${paymentStatus}`);
+            order.paymentStatus = paymentStatus;
+        }
+
+        await order.save();
+        console.log("Order updated successfully:", order.toJSON());
+
+        res.json({ message: "Order updated successfully", order });
+    } catch (error) {
+        console.error("Error updating order:", error);
         res.status(500).json({ message: "Error updating order", error: error.message });
     }
 };

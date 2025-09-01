@@ -48,7 +48,7 @@ class _UploadVerificationPageState extends State<UploadVerificationPage> {
 
       // Upload to Supabase Storage
       await supabase.storage
-          .from('verification_docs') // ✅ replace with your actual bucket
+          .from('verification-docs') 
           .uploadBinary(
             fileName,
             _pickedInfo!.bytes!,
@@ -57,7 +57,7 @@ class _UploadVerificationPageState extends State<UploadVerificationPage> {
 
       // Get public URL
       final publicUrl = supabase.storage
-          .from('verification_docs')
+          .from('verification-docs')
           .getPublicUrl(fileName);
 
       setState(() => _fileUrl = publicUrl);

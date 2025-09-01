@@ -34,8 +34,6 @@ class LoginPage extends StatelessWidget {
                   _inputField(context, emailController, passwordController),
                   const SizedBox(height: 20),
                   _loginButton(context, emailController, passwordController),
-                  const SizedBox(height: 30),
-                  _googleButton(context),
                   const SizedBox(height: 50),
                   _createAccountLink(context),
                 ],
@@ -187,25 +185,7 @@ Widget _loginButton(
   );
 }
 
-Widget _googleButton(BuildContext context) {
-  return Center(
-    child: SizedBox(
-      width: 300,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFDF9929),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        ),
-        child: const Text(
-          "Sign in with Google",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    ),
-  );
-}
+
 
 Widget _createAccountLink(BuildContext context) {
   return Row(
@@ -220,16 +200,6 @@ Widget _createAccountLink(BuildContext context) {
         },
         child: const Text(
           "Create an Account",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      const SizedBox(width: 80), // Adds space between the buttons
-      TextButton(
-        onPressed: () {
-          // Navigate to Forgot Password page
-        },
-        child: const Text(
-          "Forgot Password?",
           style: TextStyle(color: Colors.white),
         ),
       ),

@@ -97,8 +97,6 @@ class _SignupPageState extends State<SignupPage> {
                         ? CircularProgressIndicator() // Show loading spinner
                         : _loginButton(context),
                     const SizedBox(height: 30),
-                    _googleButton(context),
-                    const SizedBox(height: 30),
                     _createAccountLink(context),
                   ],
                 ),
@@ -247,28 +245,7 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget _googleButton(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 300,
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFDF9929),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
-            ),
-          ),
-          child: const Text(
-            "Sign up with Google",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
+  
   Widget _createAccountLink(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

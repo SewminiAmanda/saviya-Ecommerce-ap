@@ -1,13 +1,23 @@
-// models/message.js
+// models/messageModel.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../connection'); // your sequelize instance
+const sequelize = require('../connection');
+const ChatRoom = require('./chatRoomModel');
 
 const Message = sequelize.define('Message', {
-    sender_id: {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+    },
+    chat_room_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+            model: ChatRoom,
+            key: 'id',
+        }
     },
-    receiver_id: {
+    sender_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
@@ -23,5 +33,9 @@ const Message = sequelize.define('Message', {
     tableName: 'messages',
     timestamps: false,
 });
+
+ChatRoom.hasMany(Message, { foreignKey: 'chat_room_id' });
+Message.belongsTo(ChatRoom, { foreignKey: 'chat_room_id' });
+
 
 module.exports = Message;
