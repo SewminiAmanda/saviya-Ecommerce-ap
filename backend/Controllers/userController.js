@@ -8,14 +8,14 @@ const UserController = {
   // Register a new user
   register: async (req, res) => {
     const { first_name, last_name, email, password, address, phone_number, role, is_active, profile_picture } = req.body;
-    console.log('Request body:', req.body); // Log the request body
+    console.log('Request body:', req.body); 
     try {
       const existingUser = await User.findByEmail(email);
       if (existingUser) {
         return res.status(400).json({ success: false, message: 'User already exists with that email' });
       }
 
-      // Set default values for optional fields if they are not provided
+      
       const userData = {
         first_name,
         last_name,
@@ -27,11 +27,11 @@ const UserController = {
         profile_picture: profile_picture || null
       };
 
-      console.log('User data before creation:', userData); // Log the user data
+      console.log('User data before creation:', userData); 
 
-      const newUser = await User.create(userData); // Pass the entire userData object
+      const newUser = await User.create(userData);
 
-      // Respond with the created user data (without password)
+      
       res.status(201).json({
         success: true,
         message: 'User registered successfully',
@@ -54,7 +54,7 @@ const UserController = {
     try {
       const user = await User.findByEmail(email);
       if (user && await bcrypt.compare(password, user.password)) {
-        // Generate token with 30 minutes expiration
+        
         const token = jwt.sign({ userid: user.userid, email: user.email }, SECRET_KEY, { expiresIn: '12h' });
 
         res.status(200).json({
@@ -105,8 +105,6 @@ const UserController = {
   },
   logout: async (req, res) => {
     try {
-      // On client, token should be removed manually 
-      // localStorage.removeItem('token');
       res.status(200).json({
         success: true,
         message: 'Logout successful. Please remove the token on client side.'
@@ -117,7 +115,7 @@ const UserController = {
   },
   getAllUsers: async (req, res) => {
     try {
-      const users = await User.findAll(); // Fetch all users
+      const users = await User.findAll();
       res.status(200).json({ success: true, users });
     } catch (err) {
       res.status(500).json({ success: false, message: 'Failed to fetch users', error: err.message });
@@ -204,7 +202,7 @@ const UserController = {
   },
   updateVerificationDocs: async (req, res) => {
     const { id } = req.params;
-    const { verification_docs } = req.body; // URL of uploaded file
+    const { verification_docs } = req.body; 
 
     try {
       const user = await User.findByPk(id);
@@ -299,7 +297,7 @@ const UserController = {
         return res.status(404).json({ success: false, message: 'User not found' });
       }
 
-      // Update the shipping address
+      
       user.address = address;
       await user.save();
       console.log("Updated address:", user.address);

@@ -33,7 +33,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void initChat() async {
-    // 1️⃣ Load chat history from backend
     final history = await socketService.getChatHistory(
       widget.userId,
       widget.friendId,
@@ -42,12 +41,11 @@ class _ChatPageState extends State<ChatPage> {
     setState(() => messages = history);
     _scrollToBottom();
 
-    // 2️⃣ Connect socket
+    
     socketService.connect(widget.userId, widget.friendId);
 
-    // 3️⃣ Listen for incoming messages
+   
     socketService.onReceiveMessage((msg) {
-      // Only add messages relevant to this chat
       if ((msg['senderId'] == widget.friendId &&
               msg['receiverId'] == widget.userId) ||
           (msg['senderId'] == widget.userId &&
@@ -92,7 +90,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildMessage(Map msg) {
-    bool isMe = msg['senderId'] == widget.userId; // ✅ Correct sender check
+    bool isMe = msg['senderId'] == widget.userId;
     DateTime time = DateTime.parse(msg['timestamp']);
     String formattedTime = DateFormat('hh:mm a').format(time);
 

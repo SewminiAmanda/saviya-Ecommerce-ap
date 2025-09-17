@@ -19,7 +19,7 @@ exports.logActivity = async (req, res) => {
     }
 };
 
-// Get all activities (for admin dashboard)
+// Get all activities
 exports.getAllActivities = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;

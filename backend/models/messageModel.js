@@ -1,4 +1,3 @@
-// models/messageModel.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 const ChatRoom = require('./chatRoomModel');

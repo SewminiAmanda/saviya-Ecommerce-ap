@@ -4,7 +4,7 @@ import '../services/user_service.dart';
 
 class UpdateAddressModal {
   final int userId;
-  final String? currentAddress; // optional: current address
+  final String? currentAddress; 
 
   UpdateAddressModal({required this.userId, this.currentAddress});
 
@@ -49,10 +49,13 @@ class UpdateAddressModal {
                       ),
                     ],
                     const SizedBox(height: 15),
-                    Text(
-                      'shipping_address'.tr(),
-                      style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(5),
+                        child:Text(
+                          'shipping_address'.tr(),
+                          style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                        ),      
+                    ),                    
                     const SizedBox(height: 8),
                     TextField(
                       controller: _addressController,

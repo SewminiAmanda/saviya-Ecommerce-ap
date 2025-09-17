@@ -26,23 +26,33 @@ class CartService with ChangeNotifier {
       final token = await AuthService.getToken();
       if (token == null) throw Exception("No token found");
 
+      print("[CartService] Fetching cart...");
+      print("[CartService] URL: $baseUrl");
+      print("[CartService] Token: $token");
+
       final response = await http.get(
         Uri.parse(baseUrl),
         headers: {"Authorization": "Bearer $token"},
       );
 
+      print("[CartService] Response code: ${response.statusCode}");
+      print("[CartService] Response body: ${response.body}");
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        // Backend returns cart object with items array
         final items = data['items'] as List<dynamic>? ?? [];
+        print("[CartService] Items received: $items");
+
         _cartItems = items.map((item) => CartItem.fromJson(item)).toList();
+        print("[CartService] Parsed items: $_cartItems");
+
         notifyListeners();
       } else {
         throw Exception('Failed to fetch cart: ${response.statusCode}');
       }
     } catch (e) {
-      print('Fetch cart error: $e');
+      print('[CartService] Fetch cart error: $e');
     } finally {
       _setLoading(false);
     }
@@ -53,9 +63,12 @@ class CartService with ChangeNotifier {
     _setLoading(true);
     try {
       final token = await AuthService.getToken();
-      final userId = await AuthService.getUserId();
-      if (token == null || userId == null)
-        throw Exception("No token or userId");
+      if (token == null) throw Exception("No token found");
+
+      print("[CartService] Adding product to cart using token...");
+      print("[CartService] URL: $baseUrl/items");
+      print("[CartService] Token: $token");
+      print("[CartService] productId=$productId quantity=$quantity");
 
       final response = await http.post(
         Uri.parse("$baseUrl/items"),
@@ -63,25 +76,27 @@ class CartService with ChangeNotifier {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
         },
-        body: jsonEncode({
-          "userId": userId,
-          "productId": productId,
-          "quantity": quantity,
-        }),
+        body: jsonEncode({"productId": productId, "quantity": quantity}),
       );
 
+      print("[CartService] Response code: ${response.statusCode}");
+      print("[CartService] Response body: ${response.body}");
+
       if (response.statusCode == 200 || response.statusCode == 201) {
+        // Fetch cart after adding
         await fetchCart();
         return true;
       }
+
       return false;
     } catch (e) {
-      print('Add to cart error: $e');
+      print('[CartService] Add to cart error: $e');
       return false;
     } finally {
       _setLoading(false);
     }
   }
+
 
   /// Update cart item
   Future<bool> updateCartItem(int itemId, int quantity) async {
@@ -89,6 +104,8 @@ class CartService with ChangeNotifier {
     try {
       final token = await AuthService.getToken();
       if (token == null) throw Exception("No token found");
+
+      print("[CartService] Updating cart item $itemId with qty=$quantity");
 
       final response = await http.put(
         Uri.parse("$baseUrl/items/$itemId"),
@@ -99,13 +116,16 @@ class CartService with ChangeNotifier {
         body: jsonEncode({"quantity": quantity}),
       );
 
+      print("[CartService] Response code: ${response.statusCode}");
+      print("[CartService] Response body: ${response.body}");
+
       if (response.statusCode == 200) {
         await fetchCart();
         return true;
       }
       return false;
     } catch (e) {
-      print('Update cart item error: $e');
+      print('[CartService] Update cart item error: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -119,10 +139,15 @@ class CartService with ChangeNotifier {
       final token = await AuthService.getToken();
       if (token == null) throw Exception("No token found");
 
+      print("[CartService] Removing item $itemId");
+
       final response = await http.delete(
         Uri.parse("$baseUrl/items/$itemId"),
         headers: {"Authorization": "Bearer $token"},
       );
+
+      print("[CartService] Response code: ${response.statusCode}");
+      print("[CartService] Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         await fetchCart();
@@ -130,7 +155,7 @@ class CartService with ChangeNotifier {
       }
       return false;
     } catch (e) {
-      print('Remove cart item error: $e');
+      print('[CartService] Remove cart item error: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -140,15 +165,22 @@ class CartService with ChangeNotifier {
   /// Clear cart
   Future<bool> clearCart() async {
     _setLoading(true);
-    print("it hit here ");
+    print("[CartService] Clearing cart...");
+
     try {
       final token = await AuthService.getToken();
       if (token == null) throw Exception("No token found");
+
+      print("[CartService] URL: $baseUrl/clear");
+      print("[CartService] Token: $token");
 
       final response = await http.delete(
         Uri.parse("$baseUrl/clear"),
         headers: {"Authorization": "Bearer $token"},
       );
+
+      print("[CartService] Response code: ${response.statusCode}");
+      print("[CartService] Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         _cartItems.clear();
@@ -157,7 +189,7 @@ class CartService with ChangeNotifier {
       }
       return false;
     } catch (e) {
-      print('Clear cart error: $e');
+      print('[CartService] Clear cart error: $e');
       return false;
     } finally {
       _setLoading(false);
@@ -194,7 +226,7 @@ class CartItem {
     }
 
     final productJson = json['product'] ?? {};
-    return CartItem(
+    final item = CartItem(
       id: json['id'] ?? json['cartItemId'] ?? 0,
       productId:
           json['productId'] ?? json['product_id'] ?? productJson['id'] ?? 0,
@@ -206,5 +238,11 @@ class CartItem {
       imageUrl:
           json['imageUrl'] ?? productJson['image'] ?? productJson['image_url'],
     );
+
+    print(
+      "[CartItem.fromJson] Parsed item: id=${item.id}, productId=${item.productId}, qty=${item.quantity}, price=${item.price}, name=${item.name}",
+    );
+
+    return item;
   }
 }

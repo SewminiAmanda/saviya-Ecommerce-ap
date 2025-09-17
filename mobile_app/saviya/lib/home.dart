@@ -193,7 +193,6 @@ class _HomePageState extends State<HomePage> {
           final imageUrl = (category['imageurl'] ?? '').toString().isNotEmpty
               ? category['imageurl']
               : 'assets/images/default_category.jpeg';
-
           return GestureDetector(
             onTap: () {
               Navigator.push(

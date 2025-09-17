@@ -27,7 +27,7 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Parse numeric values safely
+   
     final double parsedPrice = double.tryParse(price) ?? 0.0;
     final int parsedQuantity = int.tryParse(quantity) ?? 0;
     final int parsedMinQuantity = int.tryParse(minQuantity) ?? 1;

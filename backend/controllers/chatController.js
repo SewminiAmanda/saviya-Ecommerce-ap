@@ -35,7 +35,7 @@ async function getChatHistory(req, res) {
 
         res.json({ success: true, messages: formatted });
     } catch (err) {
-        console.error("❌ getChatHistory failed:", err);
+        console.error(" getChatHistory failed:", err);
         res.status(500).json({ error: "Internal server error" });
     }
 }
@@ -64,7 +64,7 @@ async function sendMessage(req, res) {
             },
         });
     } catch (err) {
-        console.error("❌ sendMessage failed:", err);
+        console.error("sendMessage failed:", err);
         res.status(500).json({ error: "Internal server error" });
     }
 }
@@ -99,7 +99,7 @@ async function getUserChats(req, res) {
 
         res.json({ success: true, chats: chatList });
     } catch (err) {
-        console.error("❌ getUserChats failed:", err);
+        console.error("getUserChats failed:", err);
         res.status(500).json({ error: "Internal server error" });
     }
 }

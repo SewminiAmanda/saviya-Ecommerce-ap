@@ -5,7 +5,7 @@ import 'auth_service.dart';
 class UserService {
   static const String baseUrl = 'http://10.0.2.2:8080/api/users';
 
-  /// Update shipping address
+  // Update shipping address
   static Future<bool> updateShippingAddress(int userId, String address) async {
     try {
       final token = await AuthService.getToken();

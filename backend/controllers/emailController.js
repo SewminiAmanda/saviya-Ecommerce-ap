@@ -78,9 +78,9 @@ const EmailController = {
         html: getAdminInviteEmailHtml({ email, tempPassword }),
       });
 
-      console.log("✅ Admin invite sent successfully to " + email);
+      console.log("Admin invite sent successfully to " + email);
     } catch (error) {
-      console.error("❌ Failed to send admin invite:", error);
+      console.error("Failed to send admin invite:", error);
       throw new Error("Failed to send admin invite");
     }
   },

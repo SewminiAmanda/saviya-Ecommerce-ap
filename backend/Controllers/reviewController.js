@@ -1,6 +1,6 @@
 const Review = require("../models/reviewModel");
 const Product = require("../models/productModel");
-const User = require('../models/userModel'); // make sure User is imported
+const User = require('../models/userModel');
 
 // Add a review
 exports.addReview = async (req, res) => {
@@ -26,7 +26,7 @@ exports.addReview = async (req, res) => {
             where: { id: review.id },
             include: [{
                 model: User,
-                as: 'user', // alias must match Review.associate
+                as: 'user',
                 attributes: ['userid', 'first_name', 'last_name']
             }],
             attributes: [
@@ -35,7 +35,7 @@ exports.addReview = async (req, res) => {
                 'comment',
                 ['product_id', 'productId'],
                 ['user_id', 'userId'],
-                ['created_at', 'createdAt'], // map snake_case -> camelCase
+                ['created_at', 'createdAt'],
                 ['updated_at', 'updatedAt']
             ]
         });
@@ -72,7 +72,7 @@ exports.getProductReviews = async (req, res) => {
             order: [['created_at', 'DESC']]
         });
 
-        // Map to Flutter-friendly JSON
+      
         const formatted = reviews.map(r => ({
             id: r.id,
             productId: r.productId,

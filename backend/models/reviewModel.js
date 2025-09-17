@@ -1,4 +1,3 @@
-// models/reviewModel.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../connection");
 const User = require("./userModel");
@@ -48,8 +47,7 @@ const Review = sequelize.define(
     }
 );
 
-// Associations
-Review.belongsTo(User, { foreignKey: "userId", as: "user" }); // alias is 'user'
+Review.belongsTo(User, { foreignKey: "userId", as: "user" });
 User.hasMany(Review, { foreignKey: "userId" });
 
 Review.belongsTo(Product, { foreignKey: "productId" });

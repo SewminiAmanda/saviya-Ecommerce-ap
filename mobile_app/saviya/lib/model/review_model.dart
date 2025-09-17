@@ -1,4 +1,4 @@
-// model/review_model.dart
+
 class Review {
   final int id;
   final int rating;

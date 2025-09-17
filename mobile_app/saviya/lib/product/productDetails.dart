@@ -6,7 +6,6 @@ import '../services/product_service.dart';
 import '../model/review_model.dart';
 import '../chat/chat_page.dart';
 import '../services/auth_service.dart';
-import '../services/socket_service.dart'; // corrected import
 
 class ProductDetailsPage extends StatefulWidget {
   final String productName;

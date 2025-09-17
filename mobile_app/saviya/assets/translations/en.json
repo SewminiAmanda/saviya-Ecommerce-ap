@@ -89,5 +89,6 @@
   "User ID not found": "User ID not found",
   "Verification Rejected": "Verification Rejected",
   "Change Address": "Change Address",
-  "Total": "Total"
+  "Total": "Total",
+  "failed_load": "Failed to load categories"
 }

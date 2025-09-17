@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../home.dart';
 import '../profile_page.dart';
-import '../chat/chat_list.dart'; // <-- import your chat list page
+import '../chat/chat_list.dart';
 
 class CustomHeader extends StatelessWidget {
   const CustomHeader({super.key});
@@ -52,7 +52,7 @@ class CustomHeader extends StatelessWidget {
                 tooltip: 'cart'.tr(),
               ),
 
-              // New Chat Icon
+             
               IconButton(
                 icon: const Icon(Icons.message),
                 onPressed: () {
@@ -66,7 +66,7 @@ class CustomHeader extends StatelessWidget {
                 tooltip: 'messages'.tr(),
               ),
 
-              // Language switcher
+              
               PopupMenuButton<String>(
                 icon: const Icon(Icons.translate),
                 onSelected: (String lang) {

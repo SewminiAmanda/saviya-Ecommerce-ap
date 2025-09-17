@@ -73,7 +73,7 @@ class ProductService {
       final token = await AuthService.getToken();
       final url = userId != null
           ? "$baseUrl/product/user/$userId"
-          : "$baseUrl/product/user"; // adjust according to backend
+          : "$baseUrl/product/user"; 
       final response = await http.get(
         Uri.parse(url),
         headers: {

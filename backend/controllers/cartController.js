@@ -33,7 +33,8 @@ const getCart = async (req, res) => {
 // Add item to cart
 const addToCart = async (req, res) => {
     try {
-        const { userId, productId, quantity } = req.body;
+        const userId = req.user.userid;
+        const { productId, quantity } = req.body;
         console.log("userId:", userId);
 
         // Get or create user's cart

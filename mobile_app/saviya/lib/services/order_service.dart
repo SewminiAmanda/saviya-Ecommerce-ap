@@ -10,7 +10,7 @@ class OrderService with ChangeNotifier {
 
   bool get isPlacing => _isPlacing;
 
-  // Return the created order instead of bool
+  
   Future<Map<String, dynamic>?> placeOrder(List<CartItem> items) async {
     _isPlacing = true;
     notifyListeners();
@@ -55,7 +55,7 @@ class OrderService with ChangeNotifier {
       _isPlacing = false;
       notifyListeners();
     }
-  } // ✅ Fetch buyer orders
+  } // Fetch buyer orders
 
   Future<List<Map<String, dynamic>>> getBuyerOrders() async {
     try {
@@ -70,7 +70,7 @@ class OrderService with ChangeNotifier {
       if (response.statusCode == 200) {
         final List<dynamic> ordersList = jsonDecode(response.body);
 
-        // Map each order to a Map<String, dynamic> matching placeOrder structure
+        
         return ordersList.map<Map<String, dynamic>>((order) {
           return {
             "orderId": order['orderId'],
@@ -94,7 +94,7 @@ class OrderService with ChangeNotifier {
     }
   }
 
-  // ✅ Fetch seller/received orders in structured format
+  // Fetch seller/received orders in structured format
   Future<List<Map<String, dynamic>>> getReceivedOrders() async {
     try {
       final token = await AuthService.getToken();

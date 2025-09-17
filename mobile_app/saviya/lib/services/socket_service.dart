@@ -10,7 +10,7 @@ class SocketService {
   void connect(int userId, int friendId) {
     print('[SocketService] Connecting to WebSocket...');
     socket = IO.io(
-      'http://10.0.2.2:8080', // Socket.IO server URL (without /api)
+      'http://10.0.2.2:8080', 
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()

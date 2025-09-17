@@ -1,6 +1,6 @@
 // models/Category.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../connection'); // Your Sequelize instance
+const sequelize = require('../connection');
 
 const Category = sequelize.define('Category', {
     categoryid: {

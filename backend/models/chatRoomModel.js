@@ -1,4 +1,3 @@
-// models/chatRoomModel.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../connection');
 
@@ -29,7 +28,7 @@ const ChatRoom = sequelize.define('ChatRoom', {
     }
 }, {
     tableName: 'chat_rooms',
-    timestamps: true  // map to actual DB column
+    timestamps: true
 });
 
 module.exports = ChatRoom;

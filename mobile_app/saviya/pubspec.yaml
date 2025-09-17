@@ -93,7 +93,6 @@ flutter:
     - assets/images/default_category.jpeg
     - assets/images/agri.jpg
     - assets/images/bg.jpg
-    - assets/talkjs_chat_template.html
     - assets/translations/en.json
     - assets/translations/si.json
     - assets/translations/ta.json

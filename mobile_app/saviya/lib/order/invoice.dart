@@ -67,7 +67,7 @@ class InvoicePage extends StatelessWidget {
               ),
             ),
 
-            // --- Buyer & Seller Info ---
+           
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -133,7 +133,7 @@ class InvoicePage extends StatelessWidget {
               ],
             ),
 
-            // --- Items Table ---
+            
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -187,7 +187,7 @@ class InvoicePage extends StatelessWidget {
               ),
             ),
 
-            // --- Total Amount ---
+           
             Card(
               color: Colors.deepOrange.shade100,
               shape: RoundedRectangleBorder(

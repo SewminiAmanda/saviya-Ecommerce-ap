@@ -86,7 +86,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Future<void> _showReviewDialog(int productId) async {
     final TextEditingController _commentController = TextEditingController();
     double rating = 3.0;
-    final parentContext = context; // save parent context
+    final parentContext = context;
 
     showDialog(
       context: parentContext,
@@ -133,15 +133,13 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   ),
                   child: const Text("Submit"),
                   onPressed: () async {
-                    Navigator.pop(context); // close dialog first
+                    Navigator.pop(context); 
                     try {
                       await ProductService.addReview(
                         productId: productId,
                         rating: rating.toInt(),
                         comment: _commentController.text,
                       );
-
-                      // Use the parent context here
                       ScaffoldMessenger.of(parentContext).showSnackBar(
                         const SnackBar(content: Text("Review submitted!")),
                       );
@@ -173,7 +171,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Buyer & Seller Info
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -227,8 +224,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
             ),
           ),
-
-          // Order Items
+          
           _buildSectionTitle("Items".tr()),
           ...order['items'].map<Widget>(
             (item) => Card(

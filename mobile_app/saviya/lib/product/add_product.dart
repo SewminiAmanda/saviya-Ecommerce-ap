@@ -54,7 +54,7 @@ class _AddProductPageState extends State<AddProductPage> {
           });
         }
       } else {
-        print('Failed to load categories');
+        print('Failed_load'.tr());
       }
     } catch (e) {
       print('Error fetching categories: $e');
@@ -79,7 +79,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
 
     if (result == null || result.files.single.path == null) {
-      debugPrint("❌ No file selected.");
+      debugPrint("No file selected.");
       return;
     }
 
@@ -95,16 +95,16 @@ class _AddProductPageState extends State<AddProductPage> {
       final fileName =
           '${DateTime.now().millisecondsSinceEpoch}_${result.files.single.name}';
 
-      debugPrint("📂 Preparing to upload file: $filePath");
-      debugPrint("📝 Generated file name: $fileName");
+      debugPrint("Preparing to upload file: $filePath");
+      debugPrint("Generated file name: $fileName");
 
       final uploadedPath = await supabase.storage
           .from('products')
           .upload(fileName, file);
 
-      debugPrint("✅ Upload response path: $uploadedPath");
+      debugPrint("Upload response path: $uploadedPath");
 
-      debugPrint("✅ Upload response path: $uploadedPath");
+      debugPrint("Upload response path: $uploadedPath");
 
       if (uploadedPath.isEmpty) throw Exception('Upload failed');
 
@@ -112,7 +112,7 @@ class _AddProductPageState extends State<AddProductPage> {
           .from('products')
           .getPublicUrl(fileName);
 
-      debugPrint("🌍 Public URL generated: $publicUrl");
+      debugPrint("Public URL generated: $publicUrl");
 
       if (mounted) {
         setState(() {
@@ -121,8 +121,8 @@ class _AddProductPageState extends State<AddProductPage> {
         });
       }
     } catch (e, st) {
-      debugPrint("❌ Upload error: $e");
-      debugPrint("📌 StackTrace: $st");
+      debugPrint("Upload error: $e");
+      debugPrint("StackTrace: $st");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('file_upload_failed'.tr(args: [e.toString()]))),
       );
@@ -156,7 +156,7 @@ class _AddProductPageState extends State<AddProductPage> {
       'image': imageUrl ?? '',
     };
 
-    debugPrint("📦 Sending product data: ${jsonEncode(productData)}");
+    debugPrint("Sending product data: ${jsonEncode(productData)}");
 
     try {
       final token = await AuthService.getToken();
@@ -169,8 +169,8 @@ class _AddProductPageState extends State<AddProductPage> {
         body: jsonEncode(productData),
       );
 
-      debugPrint("📥 Response status: ${response.statusCode}");
-      debugPrint("📥 Response body: ${response.body}");
+      debugPrint("Response status: ${response.statusCode}");
+      debugPrint("Response body: ${response.body}");
 
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(
@@ -183,8 +183,8 @@ class _AddProductPageState extends State<AddProductPage> {
         ).showSnackBar(SnackBar(content: Text('failed_add_product'.tr())));
       }
     } catch (e, st) {
-      debugPrint("❌ Submit error: $e");
-      debugPrint("📌 StackTrace: $st");
+      debugPrint("Submit error: $e");
+      debugPrint("StackTrace: $st");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('error_submitting_product'.tr())));

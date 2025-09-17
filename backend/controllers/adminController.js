@@ -7,7 +7,7 @@ const { generateTempPassword } = require('../middlewears/passwordGenerator');
 const SECRET_KEY = process.env.JWT_SECRET || '78a07bdfe276a6c00a94cfda343629dbb5d338bac19dae41b1929ee63b969';
 
 const AdminController = {
-  // 👉 Invite Admin via Email (temp password)
+  //  Invite Admin via Email (temp password)
   inviteAdmin: async (req, res) => {
     try {
       const { email } = req.body;
@@ -27,7 +27,7 @@ const AdminController = {
         password: tempPassword,
         role: 'ADMIN',
         isFirstLogin: true,
-        user_name: email.split('@')[0], // Default username from email
+        user_name: email.split('@')[0], 
       });
 
       // Send email
@@ -51,7 +51,7 @@ const AdminController = {
     }
   },
 
-  /// 👉 Login - Add debug logging
+  ///  Login - Add debug logging
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -100,7 +100,7 @@ const AdminController = {
     }
   },
 
-  // 👉 Get logged in admin
+  // Get logged in admin
   getCurrentAdmin: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -121,7 +121,7 @@ const AdminController = {
     }
   },
 
-  // 👉 Update Admin
+  // Update Admin
   updateAdmin: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -145,7 +145,7 @@ const AdminController = {
     }
   },
 
-  // 👉 Delete Admin
+  // Delete Admin
   deleteAdmin: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -164,7 +164,7 @@ const AdminController = {
     }
   },
 
-  // 👉 First Login → update password
+  // First Login → update password
   updatePassword: async (req, res) => {
     try {
       const userId = req.user.id;

@@ -1,4 +1,3 @@
-// sequelize.js
 const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize('saviya', 'postgres', 'root123', {

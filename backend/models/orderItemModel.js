@@ -13,7 +13,7 @@ const OrderItem = sequelize.define(
             primaryKey: true,
             field: "orderitemid",
         },
-        orderId: {   // ✅ must match your Order association
+        orderId: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {

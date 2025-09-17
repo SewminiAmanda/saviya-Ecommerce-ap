@@ -10,7 +10,7 @@ const Admin = sequelize.define('Admin', {
     },
     user_name: {
         type: DataTypes.STRING,
-        allowNull: true, // Changed to allow null for invited admins
+        allowNull: true,
     },
     email: {
         type: DataTypes.STRING,

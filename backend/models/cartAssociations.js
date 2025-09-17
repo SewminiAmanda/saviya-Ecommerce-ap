@@ -1,8 +1,8 @@
 const Cart = require('./cartModel');
 const CartItem = require('./cartItemModel');
-const Product = require('./productModel'); // Make sure to import Product
+const Product = require('./productModel');
 
-// Cart associations
+
 Cart.hasMany(CartItem, {
     foreignKey: 'cartId',
     as: 'items'
@@ -13,7 +13,7 @@ CartItem.belongsTo(Cart, {
     as: 'cart'
 });
 
-// CartItem-Product associations
+
 CartItem.belongsTo(Product, {
     foreignKey: 'productId',
     as: 'product'

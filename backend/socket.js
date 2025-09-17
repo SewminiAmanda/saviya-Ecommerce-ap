@@ -3,7 +3,7 @@ const ChatRoom = require("./models/chatRoomModel");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
-        console.log(`✅ User connected: ${socket.id}`);
+        console.log(` User connected: ${socket.id}`);
 
         // Join chat room (based on user pair)
         socket.on("joinRoom", async ({ userId1, userId2 }) => {
@@ -16,7 +16,7 @@ module.exports = (io) => {
             }
 
             socket.join(roomName);
-            console.log(`📌 Socket ${socket.id} joined room ${roomName}`);
+            console.log(` Socket ${socket.id} joined room ${roomName}`);
         });
 
         // Send a message
@@ -44,7 +44,7 @@ module.exports = (io) => {
                     timestamp: savedMessage.createdAt,
                 });
             } catch (err) {
-                console.error("❌ Error saving message:", err);
+                console.error(" Error saving message:", err);
             }
         });
 
@@ -54,6 +54,6 @@ module.exports = (io) => {
             socket.to(roomName).emit("userTyping", { senderId });
         });
 
-        socket.on("disconnect", () => console.log(`❌ User disconnected: ${socket.id}`));
+        socket.on("disconnect", () => console.log(` User disconnected: ${socket.id}`));
     });
 };

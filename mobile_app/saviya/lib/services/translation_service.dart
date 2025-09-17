@@ -1,4 +1,3 @@
-// services/translation_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -11,7 +10,7 @@ class TranslationService {
     required String targetLang,
   }) async {
     print(
-      '🔄 TranslationService: Translating "$text" from $sourceLang to $targetLang',
+      'TranslationService: Translating "$text" from $sourceLang to $targetLang',
     );
 
     try {
@@ -27,24 +26,24 @@ class TranslationService {
       );
 
       print(
-        '📦 TranslationService: Response status code: ${response.statusCode}',
+        'TranslationService: Response status code: ${response.statusCode}',
       );
-      print('📦 TranslationService: Response body: ${response.body}');
+      print('TranslationService: Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final translatedText = jsonDecode(response.body)["translatedText"];
         print(
-          '✅ TranslationService: Successfully translated to: "$translatedText"',
+          'TranslationService: Successfully translated to: "$translatedText"',
         );
         return translatedText;
       } else {
         print(
-          '❌ TranslationService: Failed with status ${response.statusCode}',
+          'TranslationService: Failed with status ${response.statusCode}',
         );
         throw Exception("Translation failed: ${response.body}");
       }
     } catch (e) {
-      print('❌ TranslationService: Error occurred: $e');
+      print('TranslationService: Error occurred: $e');
       throw Exception("Translation error: $e");
     }
   }

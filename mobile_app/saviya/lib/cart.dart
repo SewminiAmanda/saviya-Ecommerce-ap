@@ -163,7 +163,7 @@ class _CartPageState extends State<CartPage> {
                   const SizedBox(height: 5),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white, // fill white
+                      backgroundColor: Colors.white,
                       side: const BorderSide(
                         color: mainColor,
                         width: 2,
@@ -208,7 +208,7 @@ class _CartPageState extends State<CartPage> {
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                              color: mainColor, // progress color orange
+                              color: mainColor, 
                               strokeWidth: 2,
                             ),
                           )
@@ -216,7 +216,7 @@ class _CartPageState extends State<CartPage> {
                             "place_order".tr(),
                             style: const TextStyle(
                               fontSize: 16,
-                              color: mainColor, // text color orange
+                              color: mainColor, 
                               fontWeight: FontWeight.bold,
                             ),
                           ),
